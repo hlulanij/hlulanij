@@ -15,15 +15,10 @@
   <tr>
     <td width="240" align="center"><img src="assets/ai-model.svg" width="200" alt="AI model"/></td>
     <td>
-      AI Engineer in Cape Town, building AI agents, knowledge-retrieval systems and automated data pipelines on Azure and Microsoft 365.<br/><br/>
-      I take manual business processes and turn them into governed, automated workflows: grounded in approved data, auditable end to end, and safe to put in front of users.<br/><br/>
-      <b>Experience highlights</b>
-      <ul>
-        <li>Built grounded AI agents with guardrails on Microsoft Foundry and Copilot Studio</li>
-        <li>Designed an Azure AI architecture for transcript search, PII detection and redaction</li>
-        <li>Replaced a manual performance-scoring process with scheduled pipelines and a live dashboard</li>
-        <li>Automated approvals, notifications and form workflows across Microsoft 365</li>
-      </ul>
+      AI Engineer building AI agents, knowledge-retrieval systems and automated data pipelines on Azure and Microsoft 365.<br/><br/>
+      My work began with business automation on Power Automate, Power Apps and SharePoint, alongside Copilot Studio agents. It has grown into AI engineering: agents grounded in approved knowledge, retrieval over Azure AI Search, and data pipelines that connect business systems to them.<br/><br/>
+      I care most about trust. An AI system in a business should be accurate, accountable and safe to rely on, so I design for that from the first prototype.<br/><br/>
+      I work closely with the people who own a process, turning loosely stated rules into precise definitions and then into automated workflows. I also use AI-assisted development tools such as Claude, OpenAI Codex and Microsoft Copilot to move quickly, with tests and independent checks keeping the results reliable.
     </td>
   </tr>
 </table>
@@ -39,46 +34,19 @@
 ## Tech Stack
 
 **AI & Agents**<br/>
-<img src="https://img.shields.io/badge/Azure_OpenAI-0078D4?style=flat-square&logo=microsoftazure&logoColor=white"/>
-<img src="https://img.shields.io/badge/Microsoft_Foundry-5E5E5E?style=flat-square&logo=microsoft&logoColor=white"/>
-<img src="https://img.shields.io/badge/Copilot_Studio-742774?style=flat-square"/>
-<img src="https://img.shields.io/badge/Azure_AI_Search-0078D4?style=flat-square&logo=microsoftazure&logoColor=white"/>
-<img src="https://img.shields.io/badge/Azure_AI_Language-0078D4?style=flat-square&logo=microsoftazure&logoColor=white"/>
-<img src="https://img.shields.io/badge/LLMs-412991?style=flat-square"/>
-<img src="https://img.shields.io/badge/Prompt_Engineering-0F6B73?style=flat-square"/>
-<img src="https://img.shields.io/badge/AI_Guardrails-A3262A?style=flat-square"/>
+`Azure OpenAI` `Microsoft Foundry` `Copilot Studio` `Azure AI Search` `Azure AI Language` `LLMs` `Prompt Engineering` `AI Guardrails` `Knowledge Retrieval`
 
 **Cloud & Microsoft 365**<br/>
-<img src="https://img.shields.io/badge/Microsoft_Azure-0078D4?style=flat-square&logo=microsoftazure&logoColor=white"/>
-<img src="https://img.shields.io/badge/Azure_Storage-0078D4?style=flat-square&logo=microsoftazure&logoColor=white"/>
-<img src="https://img.shields.io/badge/Google_BigQuery-669DF6?style=flat-square&logo=googlebigquery&logoColor=white"/>
-<img src="https://img.shields.io/badge/SharePoint-0078D4?style=flat-square"/>
-<img src="https://img.shields.io/badge/Microsoft_Teams-6264A7?style=flat-square"/>
-<img src="https://img.shields.io/badge/Microsoft_365-D83B01?style=flat-square"/>
+`Microsoft Azure` `Azure Storage` `Google BigQuery` `SharePoint` `Microsoft Teams` `Microsoft 365`
 
 **Automation**<br/>
-<img src="https://img.shields.io/badge/Power_Automate-0066FF?style=flat-square&logo=powerautomate&logoColor=white"/>
-<img src="https://img.shields.io/badge/Power_Apps-742774?style=flat-square"/>
-<img src="https://img.shields.io/badge/Microsoft_Forms-008272?style=flat-square"/>
-<img src="https://img.shields.io/badge/Event--driven_Workflows-555555?style=flat-square"/>
+`Power Automate` `Power Apps` `Microsoft Forms` `Event-driven Workflows`
 
 **Data & Integration**<br/>
-<img src="https://img.shields.io/badge/SQL-4479A1?style=flat-square&logo=postgresql&logoColor=white"/>
-<img src="https://img.shields.io/badge/REST_APIs-009688?style=flat-square"/>
-<img src="https://img.shields.io/badge/Data_Pipelines-555555?style=flat-square"/>
-<img src="https://img.shields.io/badge/HubSpot-FF7A59?style=flat-square&logo=hubspot&logoColor=white"/>
-<img src="https://img.shields.io/badge/ClickUp-7B68EE?style=flat-square&logo=clickup&logoColor=white"/>
+`SQL` `REST APIs` `Data Pipelines` `HubSpot` `ClickUp`
 
 **Languages & Tools**<br/>
-<img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white"/>
-<img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black"/>
-<img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white"/>
-<img src="https://img.shields.io/badge/PowerShell-5391FE?style=flat-square&logo=powershell&logoColor=white"/>
-<img src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white"/>
-<img src="https://img.shields.io/badge/Replit-F26207?style=flat-square&logo=replit&logoColor=white"/>
-<img src="https://img.shields.io/badge/Claude-D97757?style=flat-square&logo=anthropic&logoColor=white"/>
-<img src="https://img.shields.io/badge/OpenAI_Codex-412991?style=flat-square&logo=openai&logoColor=white"/>
-<img src="https://img.shields.io/badge/Microsoft_Copilot-0078D4?style=flat-square"/>
+`Python` `JavaScript` `Node.js` `PowerShell` `Git` `Replit` `Claude` `OpenAI Codex` `Microsoft Copilot`
 
 ## How I Build
 
