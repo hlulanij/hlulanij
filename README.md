@@ -48,7 +48,9 @@
 ## Selected Work
 
 ### Automated Performance-Scoring Platform
-Replaced a manual, screenshot-based fortnightly leaderboard with a warehouse-driven scoring system and a live dashboard. [Read the case study (PDF)](docs/Automated_Performance_Scoring_Platform_Case_Study.pdf) · [View the prototype](https://github.com/hlulanij/scoring-pipeline)
+Replaced a manual, screenshot-based fortnightly leaderboard with a warehouse-driven scoring system and a live dashboard.
+
+**Links:** [Case study (PDF)](docs/Automated_Performance_Scoring_Platform_Case_Study.pdf) · [Prototype](https://github.com/hlulanij/scoring-pipeline)
 
 - Scheduled ingestion from a project-management platform and a CRM into BigQuery, refreshed twice daily
 - Configuration-driven SQL scoring layer of 17 views, with self-rolling cycles and time-zone-correct reporting
@@ -58,15 +60,20 @@ Replaced a manual, screenshot-based fortnightly leaderboard with a warehouse-dri
 `SQL` `BigQuery` `Python` `PowerShell` `REST APIs`
 
 ### Transcript Intelligence Platform
-Azure AI architecture for transcript processing, knowledge retrieval, and PII detection and redaction. [View the prototype](https://github.com/hlulanij/transcript-intelligence)
+Azure AI architecture for transcript processing, knowledge retrieval, and PII detection and redaction.
+
+**Links:** [Prototype](https://github.com/hlulanij/transcript-intelligence)
 
 - Combines Azure Storage, Azure AI Search, Azure OpenAI and Azure AI Language
-- Agent guardrails keep answers grounded in approved knowledge and block raw transcripts and individual attribution
+- Redacts personal data before indexing and refuses questions about what individuals said
+- Agent guardrails keep answers grounded in approved knowledge and block raw transcripts
 
 `Azure OpenAI` `Azure AI Search` `Azure AI Language` `Microsoft Foundry`
 
 ### Grounded Business Agents
-Copilot Studio agents that answer routine business queries and trigger automated actions. [View the prototype](https://github.com/hlulanij/grounded-agent)
+Copilot Studio agents that answer routine business queries and trigger automated actions.
+
+**Links:** [Prototype](https://github.com/hlulanij/grounded-agent)
 
 - Retrieval from an Azure AI Search index of approved knowledge, with responses validated against it
 - Power Automate flows for submissions, approvals and notifications, joined to Power Apps, SharePoint and Forms
