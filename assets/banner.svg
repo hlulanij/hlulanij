@@ -31,5 +31,5 @@
 
   <text x="290" y="122" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="58" font-weight="700" fill="url(#accent)">Hlulani Mathebula</text>
   <text x="292" y="165" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="26" fill="#e6edf3">AI Engineer</text>
-  <text x="292" y="200" font-family="Consolas, 'Courier New', monospace" font-size="16" fill="#8b949e">LLMs  |  RAG  |  AI Agents  |  MLOps  |  Machine Learning</text>
+  <text x="292" y="200" font-family="Consolas, 'Courier New', monospace" font-size="16" fill="#8b949e">AI Agents  |  Azure AI  |  Knowledge Retrieval  |  Automation  |  Data Pipelines</text>
 </svg>
