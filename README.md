@@ -66,7 +66,7 @@ Azure AI architecture for transcript processing, knowledge retrieval, and PII de
 `Azure OpenAI` `Azure AI Search` `Azure AI Language` `Microsoft Foundry`
 
 ### Grounded Business Agents
-Copilot Studio agents that answer routine business queries and trigger automated actions.
+Copilot Studio agents that answer routine business queries and trigger automated actions. [View the prototype](https://github.com/hlulanij/grounded-agent)
 
 - Retrieval from an Azure AI Search index of approved knowledge, with responses validated against it
 - Power Automate flows for submissions, approvals and notifications, joined to Power Apps, SharePoint and Forms
