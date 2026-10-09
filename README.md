@@ -48,7 +48,7 @@
 ## Selected Work
 
 ### Automated Performance-Scoring Platform
-Replaced a manual, screenshot-based fortnightly leaderboard with a warehouse-driven scoring system and a live dashboard. [Read the case study (PDF)](docs/Automated_Performance_Scoring_Platform_Case_Study.pdf)
+Replaced a manual, screenshot-based fortnightly leaderboard with a warehouse-driven scoring system and a live dashboard. [Read the case study (PDF)](docs/Automated_Performance_Scoring_Platform_Case_Study.pdf) · [View the prototype](https://github.com/hlulanij/scoring-pipeline)
 
 - Scheduled ingestion from a project-management platform and a CRM into BigQuery, refreshed twice daily
 - Configuration-driven SQL scoring layer of 17 views, with self-rolling cycles and time-zone-correct reporting
