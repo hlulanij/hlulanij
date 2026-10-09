@@ -58,7 +58,7 @@ Replaced a manual, screenshot-based fortnightly leaderboard with a warehouse-dri
 `SQL` `BigQuery` `Python` `PowerShell` `REST APIs`
 
 ### Transcript Intelligence Platform
-Azure AI architecture for transcript processing, knowledge retrieval, and PII detection and redaction.
+Azure AI architecture for transcript processing, knowledge retrieval, and PII detection and redaction. [View the prototype](https://github.com/hlulanij/transcript-intelligence)
 
 - Combines Azure Storage, Azure AI Search, Azure OpenAI and Azure AI Language
 - Agent guardrails keep answers grounded in approved knowledge and block raw transcripts and individual attribution
