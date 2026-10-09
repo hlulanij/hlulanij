@@ -80,6 +80,17 @@ Copilot Studio agents that answer routine business queries and trigger automated
 
 `Copilot Studio` `Power Automate` `Power Apps` `SharePoint`
 
+### Weekly Pipeline Check
+Automated Monday sales-pipeline email for portfolio directors, with an agent that answers questions from the same snapshot.
+
+**Links:** [Prototype](https://github.com/hlulanij/pipeline-check)
+
+- Calculates outlook, status and red flags once, so the email and the agent always agree
+- Sends only for portfolios that have data and alerts the owner on an empty week
+- Agent answers only from the latest snapshot, states the week, and replies "Not in the data." otherwise
+
+`Copilot Studio` `Power Automate` `SharePoint` `Python`
+
 ## Education
 
 - Advanced Diploma in Application Development, IIE Rosebank College (2024)
