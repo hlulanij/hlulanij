@@ -61,7 +61,7 @@
 ### Automated Performance-Scoring Platform
 Replaced a manual, screenshot-based fortnightly leaderboard with a warehouse-driven scoring system and a live dashboard.
 
-**Links:** [Case study (PDF)](docs/Automated_Performance_Scoring_Platform_Case_Study.pdf) · [Prototype](https://github.com/hlulanij/scoring-pipeline)
+**Links:** [Case study (PDF)](docs/Automated_Performance_Scoring_Platform_Case_Study.pdf) · [Prototype](https://github.com/hlulanij/performance-scoring-platform)
 
 - Scheduled ingestion from a project-management platform and a CRM into BigQuery, refreshed twice daily
 - Configuration-driven SQL scoring layer of 17 views, with self-rolling cycles and time-zone-correct reporting
@@ -73,7 +73,7 @@ Replaced a manual, screenshot-based fortnightly leaderboard with a warehouse-dri
 ### Transcript Intelligence Platform
 Azure AI architecture for transcript processing, knowledge retrieval, and PII detection and redaction.
 
-**Links:** [Prototype](https://github.com/hlulanij/transcript-intelligence)
+**Links:** [Prototype](https://github.com/hlulanij/transcript-intelligence-platform)
 
 - Combines Azure Storage, Azure AI Search, Azure OpenAI and Azure AI Language
 - Redacts personal data before indexing and refuses questions about what individuals said
@@ -84,7 +84,7 @@ Azure AI architecture for transcript processing, knowledge retrieval, and PII de
 ### Grounded Business Agents
 Copilot Studio agents that answer routine business queries and trigger automated actions.
 
-**Links:** [Prototype](https://github.com/hlulanij/grounded-agent)
+**Links:** [Prototype](https://github.com/hlulanij/grounded-business-agent)
 
 - Retrieval from an Azure AI Search index of approved knowledge, with responses validated against it
 - Power Automate flows for submissions, approvals and notifications, joined to Power Apps, SharePoint and Forms
@@ -94,7 +94,7 @@ Copilot Studio agents that answer routine business queries and trigger automated
 ### Weekly Pipeline Check
 Automated Monday sales-pipeline email for portfolio directors, with an agent that answers questions from the same snapshot.
 
-**Links:** [Prototype](https://github.com/hlulanij/pipeline-check)
+**Links:** [Prototype](https://github.com/hlulanij/weekly-pipeline-check)
 
 - Calculates outlook, status and red flags once, so the email and the agent always agree
 - Sends only for portfolios that have data and alerts the owner on an empty week
