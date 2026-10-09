@@ -12,10 +12,10 @@
 
 <table>
   <tr>
-    <td width="240" align="center"><img src="assets/neural.svg" width="200" alt="Neural network"/></td>
+    <td width="240" align="center"><img src="assets/ai-model.svg" width="200" alt="AI model"/></td>
     <td>
       <b>Hey there! I'm Hlulani Jabulani Mathebula</b><br/><br/>
-      I'm an <b>AI Engineer</b> at <b>VUKA Group</b> in Cape Town, South Africa, building intelligent systems from LLM-powered applications and RAG pipelines to autonomous agents and production ML services.<br/><br/>
+      I'm an <b>AI Engineer</b> based in Cape Town, South Africa, building intelligent systems from LLM-powered applications and RAG pipelines to autonomous agents and production ML services.<br/><br/>
       I care about AI that is reliable, measurable and useful in the real world, not just impressive in a demo.<br/><br/>
       🔭 Currently exploring multi-agent systems, evaluation and model optimisation.<br/><br/>
       ⚙️ <b>Tech Stack:</b><br/>
@@ -57,7 +57,6 @@
 <p align="center">
   <a href="https://github.com/hlulanij"><img src="https://img.shields.io/badge/GITHUB-181717?style=for-the-badge&logo=github&logoColor=white"/></a>
   <a href="https://www.linkedin.com/in/hlulanimathebula"><img src="https://img.shields.io/badge/LINKEDIN-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white"/></a>
-  <a href="mailto:hlulani.mathebula@wearevuka.com"><img src="https://img.shields.io/badge/EMAIL-EA4335?style=for-the-badge&logo=gmail&logoColor=white"/></a>
 </p>
 
 > Models are never finished. They only get slightly less wrong over time.
