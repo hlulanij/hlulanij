@@ -1,102 +1,76 @@
-<!-- Profile README. Lives in a repo named exactly like your GitHub username. -->
-
-# 👋 Hello World, I'm Hlulani Jabulani Mathebula
-
 <p align="center">
   <img src="assets/banner.svg" alt="Hlulani Mathebula - AI Engineer" width="100%"/>
 </p>
 
-<p align="center">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&pause=1000&color=58A6FF&center=true&vCenter=true&width=700&lines=AI+Engineer;Building+LLM+%26+RAG+Applications;Designing+Autonomous+AI+Agents;Shipping+Machine+Learning+to+Production" alt="Typing SVG" />
-</p>
+---
 
-<p align="center">
-  <a href="https://www.linkedin.com/in/hlulanimathebula"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white"/></a>
-  <a href="mailto:hlulani.mathebula@wearevuka.com"><img src="https://img.shields.io/badge/Email-EA4335?style=for-the-badge&logo=gmail&logoColor=white"/></a>
-  <img src="https://komarev.com/ghpvc/?username=hlulanij&label=Profile+views&color=58a6ff&style=for-the-badge"/>
-</p>
+<h1 align="center">Hello World 👋 I'm Hlulani</h1>
 
 ---
 
-## 🚀 About Me
+## 🔗 Know About Me
 
-I'm an **AI Engineer** who designs, builds and deploys intelligent systems, from **LLM-powered applications and RAG pipelines** to **autonomous agents** and **production ML services**. I care about AI that is reliable, measurable and useful in the real world, not just impressive in a demo.
+<table>
+  <tr>
+    <td width="240" align="center"><img src="assets/neural.svg" width="200" alt="Neural network"/></td>
+    <td>
+      <b>Hey there! I'm Hlulani Jabulani Mathebula</b><br/><br/>
+      I'm an <b>AI Engineer</b> at <b>VUKA Group</b> in Cape Town, South Africa, building intelligent systems from LLM-powered applications and RAG pipelines to autonomous agents and production ML services.<br/><br/>
+      I care about AI that is reliable, measurable and useful in the real world, not just impressive in a demo.<br/><br/>
+      🔭 Currently exploring multi-agent systems, evaluation and model optimisation.<br/><br/>
+      ⚙️ <b>Tech Stack:</b><br/>
+      <img src="https://img.shields.io/badge/PYTHON-3776AB?style=for-the-badge&logo=python&logoColor=white"/>
+      <img src="https://img.shields.io/badge/PYTORCH-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white"/>
+      <img src="https://img.shields.io/badge/LANGCHAIN-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white"/>
+      <img src="https://img.shields.io/badge/FASTAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white"/>
+      <img src="https://img.shields.io/badge/DOCKER-2496ED?style=for-the-badge&logo=docker&logoColor=white"/>
+      <img src="https://img.shields.io/badge/SQL-4479A1?style=for-the-badge&logo=postgresql&logoColor=white"/>
+    </td>
+  </tr>
+</table>
 
-- 📍 Based in **Cape Town, South Africa** · AI Engineer at **VUKA Group**
-- 🧠 Building with **Large Language Models**, **retrieval-augmented generation** and **agentic workflows**
-- ⚙️ Turning prototypes into scalable, observable **MLOps** pipelines
-- 🔬 Exploring evaluation, prompt engineering, fine-tuning and AI safety
-- 🌱 Currently deepening my knowledge of multi-agent systems and model optimisation
-
-```python
-class HlulaniMathebula:
-    role = "AI Engineer"
-    focus = ["LLM Applications", "RAG", "AI Agents", "MLOps"]
-    languages = ["Python", "SQL", "TypeScript"]
-    frameworks = ["PyTorch", "LangChain", "Hugging Face", "FastAPI"]
-    mission = "Make AI useful, reliable and accessible"
-
-    def say_hi(self):
-        return "Let's build something intelligent together 🤖"
-```
-
----
-
-## 🎯 What I'm Up To
+## 🔗 What I Do
 
 | 🤖 Generative AI | 🧪 Machine Learning | ☁️ AI Engineering & MLOps |
 |---|---|---|
-| Building LLM-powered apps | Training & evaluating models | Deploying models as APIs |
+| LLM-powered apps | Training & evaluating models | Models as APIs |
 | RAG with vector databases | Feature engineering & pipelines | Docker & CI/CD for ML |
-| Autonomous AI agents & tool use | Deep learning with PyTorch | Monitoring & experiment tracking |
-| Prompt engineering & evaluation | NLP & text analytics | Cloud-native AI services |
+| Autonomous agents & tool use | Deep learning with PyTorch | Monitoring & experiment tracking |
 
----
+## 🔗 Top Projects
 
-## 🛠️ Tech Stack
+<table>
+  <tr>
+    <td>
+      <ul>
+        <li><b><a href="https://github.com/hlulanij/HlulaniMathebula_Portfolio">PORTFOLIO</a></b> My personal portfolio site.</li>
+        <br/>
+        <li><b>AI PROJECTS</b> LLM, RAG and agent projects are on the way. Check back soon.</li>
+      </ul>
+    </td>
+    <td width="150" align="center"><img src="assets/neural.svg" width="120" alt="Projects"/></td>
+  </tr>
+</table>
+
+## 🔗 Connect
 
 <p align="center">
-  <img src="https://skillicons.dev/icons?i=python,pytorch,tensorflow,sklearn,fastapi,flask,docker,kubernetes,git,github,githubactions,aws,azure,gcp,postgres,mongodb,redis,linux,vscode,jupyter&perline=10" alt="Tech stack"/>
+  <a href="https://github.com/hlulanij"><img src="https://img.shields.io/badge/GITHUB-181717?style=for-the-badge&logo=github&logoColor=white"/></a>
+  <a href="https://www.linkedin.com/in/hlulanimathebula"><img src="https://img.shields.io/badge/LINKEDIN-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white"/></a>
+  <a href="mailto:hlulani.mathebula@wearevuka.com"><img src="https://img.shields.io/badge/EMAIL-EA4335?style=for-the-badge&logo=gmail&logoColor=white"/></a>
 </p>
 
-**AI / ML:** PyTorch · TensorFlow · scikit-learn · Hugging Face · LangChain · LlamaIndex · OpenAI & Anthropic APIs
-**Data:** Pandas · NumPy · SQL · Vector DBs (FAISS, Chroma, Pinecone)
-**Engineering:** FastAPI · Docker · CI/CD · Cloud (AWS / Azure / GCP) · MLflow
+> Models are never finished. They only get slightly less wrong over time.
+>
+> Every experiment I run is a small step toward AI that people can actually trust.
 
----
+## 🔗 Contribution
 
-## 📊 GitHub Stats
+<p align="center">
+  <img src="https://github-readme-activity-graph.vercel.app/graph?username=hlulanij&bg_color=0d1117&color=58a6ff&line=bc8cff&point=ffffff&area=true&hide_border=true" alt="Contribution graph"/>
+</p>
 
 <p align="center">
   <img height="170" src="https://github-readme-stats.vercel.app/api?username=hlulanij&show_icons=true&theme=tokyonight&hide_border=true&bg_color=0d1117"/>
   <img height="170" src="https://github-readme-stats.vercel.app/api/top-langs/?username=hlulanij&layout=compact&theme=tokyonight&hide_border=true&bg_color=0d1117"/>
 </p>
-
-<p align="center">
-  <img src="https://github-readme-streak-stats.herokuapp.com/?user=hlulanij&theme=tokyonight&hide_border=true&background=0d1117"/>
-</p>
-
----
-
-## 📌 Featured Projects
-
-> Projects are being added, check back soon or browse my [repositories](https://github.com/hlulanij?tab=repositories).
-
-<!-- Replace once projects are uploaded:
-| Project | Description | Stack |
-|---|---|---|
-| [name](link) | One-line description | Python, LangChain |
--->
-
----
-
-## 🤝 Let's Connect
-
-Interested in collaborating on AI products, agents or ML systems? I'd love to hear from you.
-
-<p align="center">
-  <a href="https://www.linkedin.com/in/hlulanimathebula"><img src="https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white"/></a>
-  <a href="mailto:hlulani.mathebula@wearevuka.com"><img src="https://img.shields.io/badge/Email-Contact_Me-EA4335?style=for-the-badge&logo=gmail&logoColor=white"/></a>
-</p>
-
-<p align="center"><img src="https://capsule-render.vercel.app/api?type=waving&color=0:58a6ff,100:bc8cff&height=100&section=footer"/></p>
