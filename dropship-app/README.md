@@ -8,6 +8,14 @@ One mobile app (iOS + Android, Expo/React Native) with three roles, backed by a 
 | **Vendor** | Create store, add products (normal or **dropshipped** with supplier cost and margin protection), accept / prepare / ready orders |
 | **Driver** | Go online (GPS), see nearby jobs, atomic claim (no double-assign), pick up, deliver, earnings |
 
+## Review the app (for testers)
+Send testers these links. No account is needed. Both versions use **simulated data**, so every screen works without a server.
+- **Web app (iPhone, Android, any browser):** https://hlulanij.github.io/hlulanij/app/ (iPhone: Safari, Share, Add to Home Screen. Android: Chrome menu, Install app.)
+- **Android app file:** https://github.com/hlulanij/hlulanij/releases/tag/preview (download `dropit-preview.apk`, open it, allow "install unknown apps"). Built by GitHub Actions on every change to `mobile/`.
+- **Landing page:** https://hlulanij.github.io/hlulanij/
+
+Tap **Customer**, **Store owner** or **Driver** on the first screen. Things to review: ordering flow, order tracking, store order handling, driver jobs, and the dropship product form (price below supplier cost is rejected).
+
 ## Run locally
 ```bash
 cd backend && npm install && npm run seed && PUBLIC_URL=http://<your-LAN-IP>:3000 npm start   # API on :3000
