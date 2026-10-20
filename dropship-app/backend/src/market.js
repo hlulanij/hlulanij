@@ -22,6 +22,11 @@ function sniffImage(buf) {
   if (buf.length > 12 && buf.subarray(0, 4).toString() === 'RIFF' && buf.subarray(8, 12).toString() === 'WEBP') return 'image/webp';
   return null;
 }
+// Public contact details (set SUPPORT_EMAIL and SUPPORT_PHONE on the server). Anything that is not a plain email or SA number is dropped.
+const cleanContact = (c) => ({
+  email: EMAIL.test(String(c?.email || '').trim()) && String(c.email).length <= 120 ? String(c.email).trim() : '',
+  phone: SA_PHONE.test(cleanPhone(c?.phone)) ? String(c.phone).trim() : '',
+});
 const todaySast = () => new Date(Date.now() + 2 * 3600e3).toISOString().slice(0, 10);
 const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 const bad = (res, msg, status = 400) => res.status(status).json({ error: msg });
@@ -114,12 +119,12 @@ function markPaid(db, orderId) {
   } catch (e) { db.exec('ROLLBACK'); throw e; }
 }
 
-export function mountMarket(app, { db, secret, payments, publicUrl, authLimit = 10, demo = false }) {
+export function mountMarket(app, { db, secret, payments, publicUrl, authLimit = 10, demo = false, contact = {} }) {
   const { sign, auth } = marketKit({ db, secret });
   app.use('/api/auth', rateLimit({ max: authLimit, windowMs: 60_000 }));
 
   /* ---- meta + photos ---- */
-  app.get('/api/meta', (_req, res) => res.json({ areas: AREAS, depts: DEPTS, units: UNITS, demo }));
+  app.get('/api/meta', (_req, res) => res.json({ areas: AREAS, depts: DEPTS, units: UNITS, demo, contact: cleanContact(contact) }));
   app.get('/api/photos/:id', (req, res) => {
     const p = db.prepare('SELECT mime, data FROM m_photos WHERE id = ?').get(req.params.id);
     if (!p) return res.status(404).end();

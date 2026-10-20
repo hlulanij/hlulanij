@@ -1,0 +1,16 @@
+{
+  "appId": "com.mzansiconnect.app",
+  "appName": "MzansiConnect",
+  "webDir": "www",
+  "server": {
+    "url": "https://dropit-api.onrender.com",
+    "androidScheme": "https",
+    "cleartext": false,
+    "allowNavigation": ["dropit-api.onrender.com"],
+    "errorPath": "offline.html"
+  },
+  "android": {
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false
+  }
+}

@@ -119,8 +119,8 @@ function footer() {
    + `<div><h3>Shop</h3>${d.slice(0, 5).map((x) => `<a data-link href="/shop?dept=${x.id}">${esc(x.name)}</a>`).join('')}</div>`
    + `<div><h3>Services</h3>${d.slice(5).map((x) => `<a data-link href="/shop?dept=${x.id}">${esc(x.name)}</a>`).join('')}<a data-link href="/login?mode=register&role=seller">Offer a service</a></div>`
    + '<div><h3>Sell</h3><a data-link href="/sell">Sell on MzansiConnect</a><a data-link href="/login?mode=register&role=seller">Register as a seller</a></div>'
-   + '<div><h3>Help</h3><a data-link href="/sell">How it works</a><a data-link href="/my-orders">My orders</a></div>'
-   + '</div><div class="base">© 2026 MzansiConnect. Serving Giyani and surrounding villages, Limpopo.</div></div></footer>';
+   + '<div><h3>Help</h3><a data-link href="/help">Help and delivery</a><a data-link href="/terms">Terms of use</a><a data-link href="/privacy">Privacy policy</a></div>'
+   + `</div><div class="base">© 2026 MzansiConnect. Serving Giyani and surrounding villages, Limpopo.${(st.meta.contact?.email || st.meta.contact?.phone) ? ' Contact: ' + [st.meta.contact.email, st.meta.contact.phone].filter(Boolean).map(esc).join(' · ') : ''}</div></div></footer>`;
 }
 function renderChrome() { const h = $('#chrome'), f = $('#foot'); if (h) h.innerHTML = chrome(); if (f) f.innerHTML = footer(); }
 
@@ -315,10 +315,39 @@ views.dashboard = async () => {
    + `<div class="stat"><div><b>${mine.length}</b><span class="mute sm">Active listings</span></div><div><b>${toPack}</b><span class="mute sm">Orders to pack</span></div><div><b>${newReq}</b><span class="mute sm">New service requests</span></div></div>`
    + `<div class="tabs">${[['listings', 'Listings'], ['orders', 'Orders' + (toPack ? ` (${toPack})` : '')], ['requests', 'Requests' + (newReq ? ` (${newReq})` : '')], ['add', 'Add listing']].map((t) => `<a data-link href="/dashboard?tab=${t[0]}" class="${tab === t[0] ? 'on' : ''}" style="flex:none;padding:11px 16px;font-weight:600;color:${tab === t[0] ? 'var(--brand)' : 'var(--mute)'};border-bottom:3px solid ${tab === t[0] ? 'var(--brand)' : 'transparent'}">${t[1]}</a>`).join('')}</div>${body}</div>` };
 };
+
+const contactBlock = () => { const c = st.meta.contact || {}; const parts = [c.email && `email <b>${esc(c.email)}</b>`, c.phone && `phone <b>${esc(c.phone)}</b>`].filter(Boolean); return parts.length ? `<p>Contact the MzansiConnect team: ${parts.join(' or ')}.</p>` : (st.meta.demo ? '<p class="mute">Contact details will be shown here when the site launches.</p>' : ''); };
+const draftNote = () => st.meta.demo ? '<div class="note">Draft text for the preview. It will be checked before launch.</div>' : '';
+const doc = (title, body) => ({ title: `${title} | MzansiConnect`, html: `<div class="w" style="max-width:760px"><div class="crumbs"><a data-link href="/">Home</a><span>/</span>${esc(title)}</div><h1 style="margin-bottom:12px">${esc(title)}</h1>${draftNote()}<div class="doc">${body}</div></div>` });
+views.help = async () => doc('Help', `
+<h2>Buying</h2><p>Find what you need, add products to your cart and check out. For tractor, water and transport services, send a request instead. The provider phones you to agree the date and the final price.</p>
+<h2>Delivery and collection</h2><p>Sellers arrange delivery themselves. A seller charges R30 to deliver within their own village and R60 to other villages, and delivers free when your order from that seller is over R800. Livestock delivery is agreed directly with the seller. You can also choose to collect, which costs nothing.</p>
+<h2>Paying</h2><p>Choose cash on delivery or collection, instant EFT, or card. Cash is paid to the seller when you receive your order. Card and EFT are paid online before the seller starts.</p>
+<h2>Phone numbers</h2><p>After you order, you see each seller's phone number, and each seller sees yours, so you can arrange delivery. Phone numbers are never shown on the public listings.</p>
+<h2>Selling</h2><p>Registering as a seller and listing are free. Add your products or services with a price and a photo. When an order or request comes in, phone the buyer and arrange delivery or the job, then update the status in your dashboard.</p>
+<h2>Something went wrong with an order?</h2><p>First phone the seller. You can cancel an order yourself until the seller starts packing it.</p>${contactBlock()}`);
+views.terms = async () => doc('Terms of use', `
+<p>MzansiConnect is a marketplace that connects buyers and sellers in Giyani and the villages around it. The sale is between the buyer and the seller. MzansiConnect does not own, store or deliver the goods and does not provide the services listed.</p>
+<h2>Sellers</h2><p>You must be the lawful owner of what you sell, or be allowed to sell it. You are responsible for the accuracy of your listings, the quality and safety of your goods and services, delivery, and following the law. For livestock this includes ownership, health and animal movement rules. Stolen or unlawfully obtained goods are not allowed, and listings may be removed and reported.</p>
+<h2>Buyers</h2><p>Give correct contact details and directions, and be available to receive or collect your order. Cash orders are paid to the seller on delivery or collection.</p>
+<h2>Payments and cancellations</h2><p>Card and EFT payments are handled by our payment provider. You can cancel an order until the seller starts packing it. Paid orders that are cancelled are refunded to you.</p>
+<h2>Not allowed</h2><p>Illegal goods, stolen goods, false or misleading listings, harassment, and attempts to misuse the site or other people's accounts.</p>
+<h2>Our role</h2><p>We may remove listings or accounts that break these terms. To the extent the law allows, MzansiConnect is not responsible for the conduct of buyers or sellers, or for goods and services we do not provide. Nothing here limits your rights under South African consumer law.</p>
+<h2>Changes</h2><p>We may update these terms. Using the site after a change means you accept the new terms.</p>${contactBlock()}`);
+views.privacy = async () => doc('Privacy policy', `
+<p>We respect your privacy and handle personal information as the Protection of Personal Information Act (POPIA) requires.</p>
+<h2>What we collect</h2><p>Your name, email address and phone number, your village and directions to your home when you order, your orders and service requests, and the listings and photos sellers upload. Your password is stored in a scrambled form that we cannot read.</p>
+<h2>Why we collect it</h2><p>To run your account, show listings, process orders and payments, and let buyers and sellers arrange delivery and jobs.</p>
+<h2>Who sees it</h2><p>A seller sees the name, phone number, village and directions of buyers for orders and requests they fulfil. A buyer sees the seller's business name, village and phone number. Nobody else sees your phone number. We do not sell your information or use it for advertising.</p>
+<h2>Payments</h2><p>Card and EFT payments are handled by our payment provider. We do not see or store your card details.</p>
+<h2>This site and your browser</h2><p>We store your login, cart, area and saved items on your own device so the site works. We do not use advertising or tracking cookies.</p>
+<h2>How long we keep it</h2><p>We keep your information while your account is open and as long as we need to for orders and legal reasons.</p>
+<h2>Your rights</h2><p>You can ask to see, correct or delete your personal information. You can also complain to the Information Regulator.</p>${contactBlock()}`);
+
 views.notfound = async () => ({ title: 'Not found | MzansiConnect', html: '<div class="w"><div class="empty"><h1>Page not found</h1><p>The page you are looking for does not exist.</p><a class="btn" data-link href="/">Go to the home page</a></div></div>' });
 
 /* ---------- router ---------- */
-const ROUTES = [[/^\/$/, 'home'], [/^\/shop$/, 'shop'], [/^\/product\/(\d+)$/, 'product'], [/^\/cart$/, 'cart'], [/^\/checkout$/, 'checkout'], [/^\/order\/(\d+)$/, 'order'], [/^\/my-orders$/, 'my-orders'], [/^\/saved$/, 'saved'], [/^\/login$/, 'login'], [/^\/sell$/, 'sell'], [/^\/dashboard$/, 'dashboard']];
+const ROUTES = [[/^\/$/, 'home'], [/^\/shop$/, 'shop'], [/^\/product\/(\d+)$/, 'product'], [/^\/cart$/, 'cart'], [/^\/checkout$/, 'checkout'], [/^\/order\/(\d+)$/, 'order'], [/^\/my-orders$/, 'my-orders'], [/^\/saved$/, 'saved'], [/^\/login$/, 'login'], [/^\/sell$/, 'sell'], [/^\/dashboard$/, 'dashboard'], [/^\/help$/, 'help'], [/^\/terms$/, 'terms'], [/^\/privacy$/, 'privacy']];
 let navToken = 0;
 async function show(keepScroll) {
   const my = ++navToken, main = $('#main'), y = scrollY;

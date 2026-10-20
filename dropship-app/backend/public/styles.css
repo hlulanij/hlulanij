@@ -261,3 +261,6 @@ footer a:hover{color:#fff;text-decoration:underline}
 .tool:hover{text-decoration:none;color:var(--brand)}
 .logo{text-decoration:none}
 .logo:hover{text-decoration:none}
+
+.doc h2{font-size:18px;margin:22px 0 6px}
+.doc p{margin:0 0 8px;color:var(--ink)}

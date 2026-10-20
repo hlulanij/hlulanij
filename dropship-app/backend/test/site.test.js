@@ -15,7 +15,7 @@ const html = { headers: { accept: 'text/html' } };
 test('the website is served with strict security headers and works from direct links', async () => {
   const { server, base } = await boot({ demo: true });
   try {
-    for (const path of ['/', '/shop?dept=fuel', '/product/5', '/cart', '/checkout', '/my-orders', '/order/3', '/saved', '/login', '/sell', '/dashboard']) {
+    for (const path of ['/', '/help', '/terms', '/privacy', '/shop?dept=fuel', '/product/5', '/cart', '/checkout', '/my-orders', '/order/3', '/saved', '/login', '/sell', '/dashboard']) {
       const r = await fetch(base + path, html);
       assert.equal(r.status, 200, path);
       assert.match(await r.text(), /<div id="root">/);
@@ -50,4 +50,13 @@ test('listings can be fetched by id for the cart and saved items', async () => {
     assert.equal((await (await fetch(`${base}/api/listings?ids=`)).json()).total, 0);
     assert.equal((await (await fetch(`${base}/api/meta`)).json()).demo, false);
   } finally { server.close(); }
+});
+
+test('contact details appear only when valid', async () => {
+  const good = await boot({ contact: { email: 'help@example.com', phone: '082 123 4567' } });
+  const bad = await boot({ contact: { email: '<script>', phone: 'call me' } });
+  try {
+    assert.deepEqual((await (await fetch(`${good.base}/api/meta`)).json()).contact, { email: 'help@example.com', phone: '082 123 4567' });
+    assert.deepEqual((await (await fetch(`${bad.base}/api/meta`)).json()).contact, { email: '', phone: '' });
+  } finally { good.server.close(); bad.server.close(); }
 });

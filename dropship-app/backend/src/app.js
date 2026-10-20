@@ -21,6 +21,7 @@ export function createApp({
   payments = providerFromEnv(),
   authLimit = 10,
   demo = process.env.DEMO_SEED === '1',
+  contact = { email: process.env.SUPPORT_EMAIL, phone: process.env.SUPPORT_PHONE },
   publicDir = fileURLToPath(new URL('../public', import.meta.url)),
   publicUrl = process.env.PUBLIC_URL || 'http://localhost:3000',
 } = {}) {
@@ -61,7 +62,7 @@ export function createApp({
 
   mountMarketEarly(app, { db, secret, payments });
   app.use(express.json({ limit: '50kb' }));
-  mountMarket(app, { db, secret, payments, publicUrl, authLimit, demo });
+  mountMarket(app, { db, secret, payments, publicUrl, authLimit, demo, contact });
 
   const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
   const bad = (res, msg, code = 400) => res.status(code).json({ error: msg });
@@ -404,7 +405,7 @@ checkout.render('#payment-form');</script>`}
     };
     app.use(express.static(publicDir, { index: false, maxAge: '1h' }));
     app.get('/', (_req, res) => page(res));
-    app.get(/^\/(shop|product|cart|checkout|my-orders|order|saved|login|sell|dashboard)(\/.*)?$/, (_req, res) => page(res));
+    app.get(/^\/(shop|product|cart|checkout|my-orders|order|saved|login|sell|dashboard|help|terms|privacy)(\/.*)?$/, (_req, res) => page(res));
     // any other address typed into a browser gets the site's own "page not found"
     app.get(/^(?!\/(api|auth|orders|vendor|vendors|driver|payments|services|health)(\/|$))/, (req, res, next) => {
       if (req.accepts(['json', 'html']) !== 'html') return next();

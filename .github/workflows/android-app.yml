@@ -1,0 +1,83 @@
+# Builds the MzansiConnect Android app and publishes it as a GitHub Release.
+# Download: https://github.com/hlulanij/hlulanij/releases/tag/android
+name: Build MzansiConnect Android app
+on:
+  push:
+    branches: [claude/trusting-turing-2xgi7q]
+    paths: ['dropship-app/android-app/**', '.github/workflows/android-app.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-app
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: dropship-app/android-app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: dropship-app/android-app/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      - name: Create the Android project
+        run: npx cap add android
+      - name: Icon and splash screen
+        run: npm run assets
+      - name: App settings
+        run: |
+          python3 - <<'PY'
+          import re, pathlib
+          m = pathlib.Path('android/app/src/main/AndroidManifest.xml')
+          s = m.read_text()
+          perms = ('    <uses-permission android:name="android.permission.CAMERA" />\n'
+                   '    <uses-feature android:name="android.hardware.camera" android:required="false" />\n')
+          assert '<application' in s
+          if 'permission.CAMERA' not in s:
+              s = s.replace('<application', perms + '    <application', 1)
+          m.write_text(s)
+          g = pathlib.Path('android/app/build.gradle')
+          t = g.read_text()
+          t2 = re.sub(r'versionCode\s+\d+', 'versionCode ${{ github.run_number }}', t, count=1)
+          t2 = re.sub(r'versionName\s+"[^"]*"', 'versionName "1.0.${{ github.run_number }}"', t2, count=1)
+          assert t2 != t, 'could not set the app version'
+          g.write_text(t2)
+          PY
+      - name: Build release APK
+        run: cd android && ./gradlew assembleRelease --no-daemon
+      - name: Align and sign
+        run: |
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          UNSIGNED=$(ls android/app/build/outputs/apk/release/*.apk | head -1)
+          "$BT/zipalign" -f -p 4 "$UNSIGNED" aligned.apk
+          "$BT/apksigner" sign --ks preview.keystore --ks-pass pass:mzansi-preview --key-pass pass:mzansi-preview --ks-key-alias mzansi --out mzansiconnect.apk aligned.apk
+          "$BT/apksigner" verify --print-certs mzansiconnect.apk | head -3
+          ls -la mzansiconnect.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mzansiconnect-apk
+          path: dropship-app/android-app/mzansiconnect.apk
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: android
+          name: MzansiConnect (Android)
+          prerelease: true
+          files: dropship-app/android-app/mzansiconnect.apk
+          body: |
+            MzansiConnect for Android. It opens the live site, https://dropit-api.onrender.com, full screen.
+            Install: download `mzansiconnect.apk` on an Android phone, open it, and allow "install unknown apps" if asked.
+            Preview build, signed with a preview key. Built from commit ${{ github.sha }}.
