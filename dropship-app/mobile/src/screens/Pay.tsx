@@ -39,7 +39,7 @@ export default function Pay({ orderId, onClose }: { orderId: number; onClose: (p
           <WebView
             source={{ uri: url }}
             onMessage={(e) => (e.nativeEvent.data === 'completed' ? setWaiting(true) : onClose(false))}
-            originWhitelist={['https://*']}
+            originWhitelist={['http://*', 'https://*']}
           />
         )}
         {!url && !err && <ActivityIndicator style={{ margin: 24 }} />}

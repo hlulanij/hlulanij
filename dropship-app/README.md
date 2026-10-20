@@ -10,7 +10,7 @@ One mobile app (iOS + Android, Expo/React Native) with three roles, backed by a 
 
 ## Run locally
 ```bash
-cd backend && npm install && npm run seed && npm start      # API on :3000
+cd backend && npm install && npm run seed && PUBLIC_URL=http://<your-LAN-IP>:3000 npm start   # API on :3000
 cd mobile  && npm install && EXPO_PUBLIC_API_URL=http://<your-LAN-IP>:3000 npx expo start
 ```
 Scan the QR with Expo Go. Seed logins (password `password123`): `customer@demo.test`, `driver@demo.test`, `burgerjoint@demo.test`, `gadgethub@demo.test`.
