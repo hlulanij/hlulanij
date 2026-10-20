@@ -90,5 +90,7 @@ CREATE TABLE IF NOT EXISTS ratings (
   comment TEXT
 );
 `);
+  const cols = db.prepare('PRAGMA table_info(orders)').all().map((c) => c.name);
+  if (!cols.includes('payment_ref')) db.exec('ALTER TABLE orders ADD COLUMN payment_ref TEXT');
   return db;
 }

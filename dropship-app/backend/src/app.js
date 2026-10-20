@@ -5,12 +5,43 @@ import jwt from 'jsonwebtoken';
 import { openDb } from './db.js';
 import { SERVICES, distanceKm, quote } from './pricing.js';
 import { canTransition, actorFor } from './orderState.js';
+import { providerFromEnv, paymentRef, orderIdFromRef, toMoney } from './payments.js';
 
 const NEARBY_KM = 15;
 
-export function createApp({ db = openDb(), secret = process.env.JWT_SECRET || 'dev-secret-change-me' } = {}) {
+export function createApp({
+  db = openDb(),
+  secret = process.env.JWT_SECRET || 'dev-secret-change-me',
+  payments = providerFromEnv(),
+  publicUrl = process.env.PUBLIC_URL || 'http://localhost:3000',
+} = {}) {
   const app = express();
   app.use(cors());
+
+  // Card payment confirmation is trusted only from a signed webhook, never from the app.
+  // Registered before express.json() because the signature covers the raw body.
+  app.post('/payments/peach/webhook', express.raw({ type: '*/*', limit: '100kb' }), (req, res) => {
+    const raw = req.body.toString('utf8');
+    if (!payments.verifyWebhook(req.headers, raw)) return res.status(401).json({ error: 'bad signature' });
+    let evt;
+    try { evt = payments.parseWebhook(raw); } catch { return res.status(400).json({ error: 'bad payload' }); }
+    const id = orderIdFromRef(evt.ref);
+    const o = id && db.prepare('SELECT * FROM orders WHERE id = ? AND payment_ref = ?').get(id, evt.ref);
+    if (!o) return res.status(200).json({ ok: true }); // unknown ref: ack so Peach stops retrying
+    if (evt.success) {
+      // A paid amount that differs from the order total is never auto-accepted.
+      if (evt.currency !== 'ZAR' || evt.amountCents !== o.total_cents) {
+        console.error(`payment amount mismatch for order ${o.id}`);
+        db.prepare("UPDATE orders SET payment_status = 'review' WHERE id = ? AND payment_status = 'awaiting_payment'").run(o.id);
+        return res.status(200).json({ ok: true });
+      }
+      markPaid(o.id);
+    } else {
+      db.prepare("UPDATE orders SET payment_status = 'failed' WHERE id = ? AND payment_status = 'awaiting_payment'").run(o.id);
+    }
+    res.json({ ok: true });
+  });
+
   app.use(express.json());
 
   const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
@@ -107,7 +138,7 @@ export function createApp({ db = openDb(), secret = process.env.JWT_SECRET || 'd
   app.get('/vendor/orders', auth('vendor'), wrap((req, res) => {
     const v = myVendor(req);
     if (!v) return res.json([]);
-    res.json(db.prepare("SELECT * FROM orders WHERE vendor_id = ? ORDER BY id DESC").all(v.id).map(withItems));
+    res.json(db.prepare("SELECT * FROM orders WHERE vendor_id = ? AND status != 'pending_payment' ORDER BY id DESC").all(v.id).map(withItems));
   }));
 
   function withItems(o) {
@@ -163,14 +194,15 @@ export function createApp({ db = openDb(), secret = process.env.JWT_SECRET || 'd
       const r = db.prepare(`INSERT INTO orders (kind,customer_id,vendor_id,status,pickup_address,pickup_lat,pickup_lng,dropoff_address,dropoff_lat,dropoff_lng,
           subtotal_cents,delivery_fee_cents,service_fee_cents,tip_cents,total_cents,payment_method,payment_status,notes)
           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(
-        b.kind, req.user.id, b.vendor?.id ?? null, 'placed', from.address, from.lat, from.lng, d.address, d.lat, d.lng,
+        b.kind, req.user.id, b.vendor?.id ?? null, method === 'card' ? 'pending_payment' : 'placed', from.address, from.lat, from.lng, d.address, d.lat, d.lng,
         q.subtotal_cents, q.delivery_fee_cents, q.service_fee_cents, q.tip_cents, q.total_cents,
-        method, method === 'card' ? 'authorised' : 'pending_cash', req.body.notes || null);
+        method, method === 'card' ? 'awaiting_payment' : 'pending_cash', req.body.notes || null);
       const id = Number(r.lastInsertRowid);
       for (const { p, qty } of b.lines || []) {
         db.prepare('INSERT INTO order_items (order_id,product_id,name,qty,unit_price_cents) VALUES (?,?,?,?,?)').run(id, p.id, p.name, qty, p.price_cents);
       }
-      db.prepare('INSERT INTO order_events (order_id,status) VALUES (?,?)').run(id, 'placed');
+      db.prepare('INSERT INTO order_events (order_id,status) VALUES (?,?)').run(id, method === 'card' ? 'pending_payment' : 'placed');
+      if (method === 'card') db.prepare('UPDATE orders SET payment_ref = ? WHERE id = ?').run(paymentRef(id), id);
       db.exec('COMMIT');
       res.status(201).json(withItems(db.prepare('SELECT * FROM orders WHERE id = ?').get(id)));
     } catch (e) {
@@ -202,7 +234,7 @@ export function createApp({ db = openDb(), secret = process.env.JWT_SECRET || 'd
     if (!canTransition(o.kind, o.status, to)) return bad(res, `cannot go from ${o.status} to ${to}`, 409);
     const actor = actorFor(to);
     if (actor !== 'any' && actor !== req.user.role) return bad(res, 'forbidden', 403);
-    if (to === 'cancelled' && req.user.role === 'customer' && o.status !== 'placed') return bad(res, 'too late to cancel', 409);
+    if (to === 'cancelled' && req.user.role === 'customer' && !['placed', 'pending_payment'].includes(o.status)) return bad(res, 'too late to cancel', 409);
     if (to === 'cancelled' && req.user.role === 'driver') return bad(res, 'forbidden', 403);
     if (to === 'picked_up' && o.driver_id !== req.user.id) return bad(res, 'claim the job first', 403);
     setStatus(o.id, to);
@@ -210,8 +242,9 @@ export function createApp({ db = openDb(), secret = process.env.JWT_SECRET || 'd
   }));
 
   function setStatus(id, to) {
-    const paid = to === 'delivered' ? ", payment_status = CASE payment_method WHEN 'cash' THEN 'paid' ELSE 'captured' END" : '';
-    const refund = to === 'cancelled' ? ", payment_status = CASE payment_method WHEN 'card' THEN 'refunded' ELSE 'void' END" : '';
+    const paid = to === 'delivered' ? ", payment_status = CASE payment_method WHEN 'cash' THEN 'paid' ELSE payment_status END" : '';
+    // A paid card order needs a real refund through Peach; flag it for ops rather than claiming it happened.
+    const refund = to === 'cancelled' ? ", payment_status = CASE WHEN payment_status = 'paid' THEN 'refund_pending' ELSE 'void' END" : '';
     db.prepare(`UPDATE orders SET status = ?, updated_at = CURRENT_TIMESTAMP${paid}${refund} WHERE id = ?`).run(to, id);
     db.prepare('INSERT INTO order_events (order_id,status) VALUES (?,?)').run(id, to);
   }
@@ -256,6 +289,68 @@ export function createApp({ db = openDb(), secret = process.env.JWT_SECRET || 'd
     const r = db.prepare("SELECT COUNT(*) n, COALESCE(SUM(delivery_fee_cents + tip_cents),0) gross FROM orders WHERE driver_id = ? AND status='delivered'").get(req.user.id);
     res.json({ deliveries: r.n, earnings_cents: Math.round(r.gross * 0.8) });
   }));
+
+  // ---- card payments
+  function markPaid(orderId) {
+    const o = db.prepare('SELECT * FROM orders WHERE id = ?').get(orderId);
+    if (!o || o.payment_status === 'paid' || o.payment_status === 'refund_pending') return; // idempotent
+    if (o.status === 'cancelled') { // paid after the customer cancelled
+      db.prepare("UPDATE orders SET payment_status = 'refund_pending' WHERE id = ?").run(o.id);
+      return;
+    }
+    db.exec('BEGIN');
+    try {
+      db.prepare("UPDATE orders SET payment_status = 'paid' WHERE id = ?").run(o.id);
+      if (o.status === 'pending_payment') setStatus(o.id, 'placed');
+      db.exec('COMMIT');
+    } catch (e) { db.exec('ROLLBACK'); throw e; }
+  }
+
+  app.post('/orders/:id/pay', auth('customer'), wrap(async (req, res) => {
+    const o = db.prepare('SELECT * FROM orders WHERE id = ? AND customer_id = ?').get(req.params.id, req.user.id);
+    if (!o) return bad(res, 'not found', 404);
+    if (o.payment_method !== 'card' || o.status !== 'pending_payment') return bad(res, 'order is not awaiting card payment', 409);
+    let co;
+    try {
+      co = await payments.createCheckout({ ref: o.payment_ref, amountCents: o.total_cents, publicUrl });
+    } catch (e) {
+      console.error(e.message);
+      return bad(res, 'payment provider unavailable, try again', 502);
+    }
+    const token = jwt.sign({ purpose: 'checkout', orderId: o.id, ...co, mock: payments.name === 'mock' }, secret, { expiresIn: '25m' });
+    res.json({ checkout_url: `${publicUrl}/payments/checkout?token=${encodeURIComponent(token)}`, amount: toMoney(o.total_cents) });
+  }));
+
+  // Page loaded in the app's WebView. The token (not a login) is the credential.
+  app.get('/payments/checkout', (req, res) => {
+    let c;
+    try { c = jwt.verify(String(req.query.token || ''), secret); } catch { return res.status(401).send('Link expired'); }
+    if (c.purpose !== 'checkout') return res.status(401).send('Invalid link');
+    const safe = (v) => JSON.stringify(v).replace(/</g, '\\u003c');
+    res.type('html').send(`<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1">
+<body style="font-family:sans-serif;margin:0;padding:12px"><div id="payment-form" style="min-height:360px"></div>
+${c.mock
+  ? `<button style="width:100%;padding:14px" onclick="fetch('/payments/mock/complete?token='+encodeURIComponent(${safe(String(req.query.token))}),{method:'POST'}).then(()=>window.ReactNativeWebView&&window.ReactNativeWebView.postMessage('completed'))">Simulate successful payment (test mode)</button>`
+  : `<script src="${c.scriptUrl}"></script><script>
+// [VERIFY] initiate/render API per Peach's Embedded Checkout tutorial
+var post=function(m){window.ReactNativeWebView&&window.ReactNativeWebView.postMessage(m)};
+var checkout=Checkout.initiate({key:${safe(c.entityId)},checkoutId:${safe(c.checkoutId)},options:{},
+ events:{onCompleted:function(){post('completed')},onCancelled:function(){post('cancelled')},onExpired:function(){post('expired')}}});
+checkout.render('#payment-form');</script>`}
+</body>`);
+  });
+
+  app.get('/payments/return', (_req, res) => res.type('html').send('<body style="font-family:sans-serif;padding:24px">Processing your payment… you can close this screen.</body>'));
+
+  app.post('/payments/mock/complete', (req, res) => {
+    if (payments.name !== 'mock') return bad(res, 'not available', 404);
+    try {
+      const c = jwt.verify(String(req.query.token || ''), secret);
+      if (c.purpose !== 'checkout') throw new Error('x');
+      markPaid(c.orderId);
+      res.json({ ok: true });
+    } catch { bad(res, 'invalid token', 401); }
+  });
 
   // ---- ratings
   app.post('/orders/:id/rating', auth('customer'), wrap((req, res) => {

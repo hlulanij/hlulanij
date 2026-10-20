@@ -81,6 +81,7 @@ test('dropship validation and cancel/refund', async () => {
     assert.equal(list.products[0].supplier_cost_cents, undefined); // cost is private
     const o = (await call('POST', '/orders', { vendor_id: 1, items: [{ product_id: p.id, qty: 1 }], dropoff, payment_method: 'card' }, cust)).body;
     const c = await call('POST', `/orders/${o.id}/status`, { status: 'cancelled' }, cust);
-    assert.equal(c.body.payment_status, 'refunded');
+    assert.equal(c.body.status, 'cancelled');
+    assert.equal(c.body.payment_status, 'void'); // never paid, nothing to refund
   } finally { server.close(); }
 });

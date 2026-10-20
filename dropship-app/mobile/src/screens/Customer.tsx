@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { api, DEMO_HOME, rand } from '../api';
 import { Button, Card, Err, H, Input, Muted, Tabs, colors } from '../ui';
+import Pay from './Pay';
 
 const SERVICES = ['food', 'groceries', 'pharmacy', 'liquor', 'retail'];
 const LABEL: Record<string, string> = { food: '🍔 Food', groceries: '🛒 Groceries', pharmacy: '💊 Pharmacy', liquor: '🍷 Liquor', retail: '📦 Shopping' };
@@ -58,6 +59,7 @@ function Store({ id, onBack, onOrdered }: { id: number; onBack: () => void; onOr
   const [quote, setQuote] = useState<any>(null);
   const [pay, setPay] = useState<'cash' | 'card'>('cash');
   const [err, setErr] = useState('');
+  const [payFor, setPayFor] = useState<number | null>(null);
 
   useEffect(() => { api('GET', `/vendors/${id}`).then(setV).catch((e) => setErr(e.message)); }, [id]);
   const items = Object.entries(cart).filter(([, q]) => q > 0).map(([pid, qty]) => ({ product_id: +pid, qty }));
@@ -70,7 +72,10 @@ function Store({ id, onBack, onOrdered }: { id: number; onBack: () => void; onOr
 
   async function place() {
     setErr('');
-    try { await api('POST', '/orders', { ...body, payment_method: pay }); onOrdered(); } catch (e: any) { setErr(e.message); }
+    try {
+      const o = await api('POST', '/orders', { ...body, payment_method: pay });
+      if (pay === 'card') setPayFor(o.id); else onOrdered();
+    } catch (e: any) { setErr(e.message); }
   }
   const bump = (pid: number, d: number) => setCart((c) => ({ ...c, [pid]: Math.max(0, (c[pid] || 0) + d) }));
 
@@ -99,6 +104,7 @@ function Store({ id, onBack, onOrdered }: { id: number; onBack: () => void; onOr
         </Card>
       )}
       <Err msg={err} />
+      {payFor && <Pay orderId={payFor} onClose={() => { setPayFor(null); onOrdered(); }} />}
     </ScrollView>
   );
 }
@@ -130,6 +136,7 @@ function Parcel({ onOrdered }: { onOrdered: () => void }) {
 
 function Orders() {
   const [orders, setOrders] = useState<any[]>([]);
+  const [payFor, setPayFor] = useState<number | null>(null);
   const load = useCallback(() => { api('GET', '/orders').then(setOrders).catch(() => {}); }, []);
   useEffect(() => { load(); const t = setInterval(load, 5000); return () => clearInterval(t); }, [load]);
 
@@ -142,10 +149,12 @@ function Orders() {
         <Card key={o.id}>
           <Text style={{ fontWeight: '700' }}>#{o.id} · {o.kind === 'parcel' ? 'Parcel' : 'Store order'} · {rand(o.total_cents)}</Text>
           <Text style={{ color: colors.ok, fontWeight: '700', marginVertical: 4 }}>{o.status.replace('_', ' ')}</Text>
-          {o.status === 'placed' && <Button kind="ghost" title="Cancel" onPress={() => act(`/orders/${o.id}/status`, { status: 'cancelled' })} />}
+          {o.status === 'pending_payment' && <Button title="Pay now" onPress={() => setPayFor(o.id)} />}
+          {['placed', 'pending_payment'].includes(o.status) && <Button kind="ghost" title="Cancel" onPress={() => act(`/orders/${o.id}/status`, { status: 'cancelled' })} />}
           {o.status === 'delivered' && <Button kind="ghost" title="Rate 5★" onPress={() => act(`/orders/${o.id}/rating`, { vendor_stars: 5, driver_stars: 5 })} />}
         </Card>
       ))}
+      {payFor && <Pay orderId={payFor} onClose={() => { setPayFor(null); load(); }} />}
     </ScrollView>
   );
 }
