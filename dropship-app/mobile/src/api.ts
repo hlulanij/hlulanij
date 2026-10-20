@@ -1,4 +1,8 @@
 import * as SecureStore from 'expo-secure-store';
+import { demoApi } from './demoApi';
+
+// Browser preview: EXPO_PUBLIC_DEMO=1 swaps the network for an in-memory fake backend.
+export const DEMO = process.env.EXPO_PUBLIC_DEMO === '1';
 
 // Set EXPO_PUBLIC_API_URL to your deployed backend. On an Android emulator use http://10.0.2.2:3000.
 export const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
@@ -11,6 +15,7 @@ let token: string | null = null;
 export const setToken = (t: string | null) => { token = t; };
 
 export async function saveSession(s: Session | null) {
+  if (DEMO) return;
   if (s) await SecureStore.setItemAsync('session', JSON.stringify(s));
   else await SecureStore.deleteItemAsync('session');
 }
@@ -22,6 +27,7 @@ export async function loadSession(): Promise<Session | null> {
 }
 
 export async function api<T = any>(method: string, path: string, body?: unknown): Promise<T> {
+  if (DEMO) return demoApi(method, path, body, token) as Promise<T>;
   const res = await fetch(API_URL + path, {
     method,
     headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}) },

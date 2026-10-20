@@ -21,6 +21,8 @@
       "package": "com.example.dropit"
     },
     "web": {
+      "bundler": "metro",
+      "output": "single",
       "favicon": "./assets/favicon.png"
     },
     "plugins": [

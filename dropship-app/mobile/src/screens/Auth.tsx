@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text } from 'react-native';
-import { api, Role, Session } from '../api';
+import { api, DEMO, Role, Session } from '../api';
 import { Button, Err, H, Input, Muted, Tabs, colors } from '../ui';
 
 const ROLES = ['customer', 'vendor', 'driver'] as const;
@@ -38,6 +38,15 @@ export default function Auth({ onSession }: { onSession: (s: Session) => void })
       <Input placeholder="Password (8+ characters)" secureTextEntry value={password} onChangeText={setPassword} />
       <Err msg={err} />
       <Button title={mode === 'login' ? 'Log in' : 'Sign up'} onPress={submit} disabled={busy} />
+      {DEMO && (
+        <View style={{ marginTop: 12 }}>
+          <Muted>Preview: jump straight in as</Muted>
+          {([['Customer', 'customer@demo.test'], ['Store owner', 'burgerjoint@demo.test'], ['Driver', 'driver@demo.test']] as const).map(([label, mail]) => (
+            <Button key={mail} kind="ghost" title={label}
+              onPress={async () => onSession(await api<Session>('POST', '/auth/login', { email: mail, password: 'password123' }))} />
+          ))}
+        </View>
+      )}
       <Button kind="ghost" title={mode === 'login' ? 'New here? Sign up' : 'Have an account? Log in'} onPress={() => setMode(mode === 'login' ? 'register' : 'login')} />
     </View>
   );

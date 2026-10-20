@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ScrollView, Text } from 'react-native';
 import * as Location from 'expo-location';
-import { api, rand } from '../api';
+import { api, DEMO, rand } from '../api';
 import { Button, Card, Err, H, Muted, colors } from '../ui';
 
 export default function Driver() {
@@ -19,6 +19,7 @@ export default function Driver() {
   }, []);
 
   async function ping(isOnline: boolean) {
+    if (DEMO) { await api('POST', '/driver/location', { lat: -33.9249, lng: 18.4241, online: isOnline }); return true; }
     const perm = await Location.requestForegroundPermissionsAsync();
     if (perm.status !== 'granted') { setErr('Location permission is required to go online'); return false; }
     const p = await Location.getCurrentPositionAsync({});
