@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import { openDb } from './db.js';
 import { SERVICES, distanceKm, quote } from './pricing.js';
 import { canTransition, actorFor } from './orderState.js';
+import { rateLimit } from './rateLimit.js';
 import { providerFromEnv, paymentRef, orderIdFromRef, toMoney } from './payments.js';
 
 const NEARBY_KM = 15;
@@ -13,10 +14,18 @@ export function createApp({
   db = openDb(),
   secret = process.env.JWT_SECRET || 'dev-secret-change-me',
   payments = providerFromEnv(),
+  authLimit = 10,
   publicUrl = process.env.PUBLIC_URL || 'http://localhost:3000',
 } = {}) {
   const app = express();
+  app.set('trust proxy', 1); // behind Render/Railway's proxy, so req.ip is the real client
+  app.disable('x-powered-by');
+  app.use((_req, res, next) => {
+    res.set({ 'x-content-type-options': 'nosniff', 'referrer-policy': 'no-referrer', 'strict-transport-security': 'max-age=15552000' });
+    next();
+  });
   app.use(cors());
+  app.use('/auth', rateLimit({ max: authLimit, windowMs: 60_000 })); // slows password guessing
 
   // Card payment confirmation is trusted only from a signed webhook, never from the app.
   // Registered before express.json() because the signature covers the raw body.
@@ -42,7 +51,7 @@ export function createApp({
     res.json({ ok: true });
   });
 
-  app.use(express.json());
+  app.use(express.json({ limit: '50kb' }));
 
   const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
   const bad = (res, msg, code = 400) => res.status(code).json({ error: msg });

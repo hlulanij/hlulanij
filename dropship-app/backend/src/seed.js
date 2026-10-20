@@ -1,8 +1,9 @@
 import bcrypt from 'bcryptjs';
+import { fileURLToPath } from 'node:url';
 import { openDb } from './db.js';
 
 // Demo data around Cape Town. Run: npm run seed (uses DB_PATH or ./data.sqlite)
-const db = openDb(process.env.DB_PATH || './data.sqlite');
+export function seed(db) {
 const pw = bcrypt.hashSync('password123', 10);
 const user = (role, name, email) =>
   Number(db.prepare('INSERT OR IGNORE INTO users (role,name,email,password_hash) VALUES (?,?,?,?)').run(role, name, email, pw).lastInsertRowid)
@@ -31,4 +32,9 @@ if (!db.prepare('SELECT 1 FROM vendors WHERE owner_id = ?').get(owner)) {
   db.prepare("INSERT INTO products (vendor_id,name,price_cents,supplier_cost_cents,fulfilment) VALUES (?,?,?,?,'dropship')").run(vid, 'Phone Stand', 19900, 9000);
   db.prepare("INSERT INTO products (vendor_id,name,price_cents,supplier_cost_cents,fulfilment) VALUES (?,?,?,?,'dropship')").run(vid, 'USB-C Cable', 14900, 5000);
 }
-console.log('Seeded. Logins use password "password123": customer@demo.test, driver@demo.test, burgerjoint@demo.test, ...');
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  seed(openDb(process.env.DB_PATH || './data.sqlite'));
+  console.log('Seeded. Logins use password "password123": customer@demo.test, driver@demo.test, burgerjoint@demo.test, ...');
+}

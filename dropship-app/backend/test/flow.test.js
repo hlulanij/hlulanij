@@ -85,3 +85,13 @@ test('dropship validation and cancel/refund', async () => {
     assert.equal(c.body.payment_status, 'void'); // never paid, nothing to refund
   } finally { server.close(); }
 });
+
+test('auth endpoints are rate limited', async () => {
+  const server = createApp({ db: openDb(':memory:'), secret: 't', authLimit: 3 }).listen(0);
+  try {
+    const url = `http://127.0.0.1:${server.address().port}/auth/login`;
+    const hit = () => fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email: 'a@b.c', password: 'x' }) });
+    assert.deepEqual([(await hit()).status, (await hit()).status, (await hit()).status], [401, 401, 401]);
+    assert.equal((await hit()).status, 429);
+  } finally { server.close(); }
+});

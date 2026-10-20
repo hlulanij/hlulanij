@@ -16,6 +16,20 @@ cd mobile  && npm install && EXPO_PUBLIC_API_URL=http://<your-LAN-IP>:3000 npx e
 Scan the QR with Expo Go. Seed logins (password `password123`): `customer@demo.test`, `driver@demo.test`, `burgerjoint@demo.test`, `gadgethub@demo.test`.
 Backend tests: `cd backend && npm test`.
 
+## Deploy the backend free on Render (phone-friendly)
+1. On render.com sign up with GitHub (`hlulanij`), then **New > Blueprint**, pick this repo and branch `claude/trusting-turing-2xgi7q`.
+2. Approve the plan. Render builds the Docker image, generates `JWT_SECRET`, and gives you a URL like `https://dropit-api.onrender.com`.
+3. Open `<url>/health`; it should show `{"ok":true}` (first load after idle takes ~50 s on the free plan).
+4. That URL is your `EXPO_PUBLIC_API_URL`.
+
+Free-plan limits: the service sleeps when idle and its disk is **wiped on every restart**, so data resets (demo accounts are
+re-created each boot via `DEMO_SEED=1`). Fine for testing, not for real customers. For real use, move to Railway (paid, ~US$5/mo)
+with a volume at `/data` and `DB_PATH=/data/data.sqlite`, or move the database to Postgres. Then remove `DEMO_SEED` and
+`ALLOW_MOCK_PAYMENTS` and set the Peach variables.
+
+Built-in hardening: HTTPS-only headers, login/register rate limiting (10/min/IP), 50 KB body limit, bcrypt passwords,
+server-side pricing, refusal to start in production without a strong `JWT_SECRET` or without payments configured.
+
 ## Ship it
 1. **Backend**: deploy `backend/` (Dockerfile included) to Fly.io / Railway / Render with a persistent volume at `/data`, and set `JWT_SECRET` to a long random value.
 2. **Mobile**: set the URL in `mobile/eas.json`, change the bundle id / package (`com.example.dropit`) in `app.json`, then
