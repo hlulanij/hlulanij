@@ -1,0 +1,747 @@
+<title>MzansiConnect</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: plain white marketplace for Giyani and nearby villages. Flag-colour stripe, dark utility bar with the area picker, header with search, department links, 1200px content column. Flag green as the one brand colour, flag red for sale tags, gold for stars. Single light look on purpose. */
+:root{
+  color-scheme:light;
+  --bg:#ffffff; --soft:#f4f6f5; --tint:#eef6f1; --line:#dfe4e1; --ink:#1b1f1d; --mute:#58625c;
+  --brand:#007749; --brand-dark:#005a38; --util:#10241a; --util-ink:#d6e6dc;
+  --sale:#c9321f; --star:#e8a200; --ok:#16794c; --warn:#8a5200; --gold:#ffb81c;
+  --f:"Public Sans","Segoe UI",system-ui,-apple-system,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f);font-size:15px;line-height:1.5;margin:0}
+a{color:var(--brand);text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid #7fc1a0;outline-offset:2px}
+h1,h2,h3{margin:0;line-height:1.2}
+h1{font-size:26px;font-weight:700}
+h2{font-size:20px;font-weight:700}
+h3{font-size:16px;font-weight:600}
+.w{max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.mute{color:var(--mute)}
+.sm{font-size:13px}
+.row{display:flex;align-items:center;gap:12px}
+.between{justify-content:space-between}
+.grow{flex:1;min-width:0}
+.wrapx{flex-wrap:wrap}
+.ell{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* flag stripe, utility bar, header */
+.flag{display:flex;height:5px}
+.flag i{flex:1}
+.util{background:var(--util);color:var(--util-ink);font-size:12.5px}
+.util .w{display:flex;justify-content:space-between;gap:16px;min-height:36px;align-items:center}
+.util a,.util button{color:var(--util-ink);background:none;border:0;padding:0}
+.util .links{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+.util label{display:flex;gap:8px;align-items:center}
+.util select{background:#1d3a2b;color:#fff;border:1px solid #2e5440;border-radius:4px;padding:4px 8px;font-size:12.5px}
+.head{border-bottom:1px solid var(--line);background:var(--bg)}
+.head .w{display:flex;align-items:center;gap:22px;padding-block:14px}
+.logo{display:flex;align-items:center;gap:8px;font-size:23px;font-weight:700;letter-spacing:-.02em;color:var(--brand);white-space:nowrap;background:none;border:0;padding:0}
+.logo b{color:var(--ink);font-weight:500}
+.logo svg{width:30px;height:30px;flex:none}
+.sf{flex:1;display:flex;min-width:0;border:2px solid var(--brand);border-radius:4px;overflow:hidden;background:#fff}
+.sf select{border:0;border-right:1px solid var(--line);background:var(--soft);padding:0 10px;max-width:170px;font-size:13px}
+.sf input{flex:1;min-width:0;border:0;padding:11px 12px;outline:0}
+.sf button{border:0;background:var(--brand);color:#fff;font-weight:600;padding:0 20px}
+.tools{display:flex;gap:6px;align-items:center}
+.tool{display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 10px;font-size:12px;color:var(--ink);background:none;border:0;position:relative}
+.tool svg{width:22px;height:22px}
+.tool .n{position:absolute;top:-2px;right:2px;background:var(--brand);color:#fff;border-radius:9px;min-width:17px;height:17px;font-size:11px;display:grid;place-items:center;padding:0 4px;font-style:normal}
+.dept{border-bottom:1px solid var(--line);background:var(--bg)}
+.dept .w{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+.dept .w::-webkit-scrollbar{display:none}
+.dept button{flex:none;border:0;background:none;padding:12px 11px;font-size:14px;font-weight:500;color:var(--ink);border-bottom:3px solid transparent}
+.dept button:hover,.dept button.on{border-bottom-color:var(--brand);color:var(--brand)}
+.dept button.sell{margin-left:auto;color:var(--brand);font-weight:600}
+.dept .sep{flex:none;width:1px;background:var(--line);margin:10px 6px}
+
+/* page basics */
+main{min-height:60vh;padding-block:20px 48px}
+.crumbs{font-size:13px;color:var(--mute);margin-bottom:14px}
+.crumbs button{background:none;border:0;padding:0;color:var(--brand)}
+.crumbs span{margin:0 6px}
+.sec{margin-top:36px}
+.sec .row{margin-bottom:14px}
+.link{background:none;border:0;padding:0;color:var(--brand);font-weight:600}
+.link:hover{text-decoration:underline}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:2px solid var(--brand);background:var(--brand);color:#fff;border-radius:4px;padding:11px 20px;font-weight:600;text-align:center}
+.btn:hover{background:var(--brand-dark);border-color:var(--brand-dark)}
+.btn.o{background:#fff;color:var(--brand)}
+.btn.o:hover{background:var(--tint)}
+.btn.w100{width:100%}
+.btn.sm{padding:7px 12px;font-size:13px}
+
+/* home */
+.banner{background:var(--tint);border:1px solid #cfe3d7;border-radius:6px;padding:32px 36px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.banner h1{font-size:32px;max-width:16em}
+.banner p{margin:10px 0 18px;color:var(--mute);max-width:34em}
+.banner .pics{display:flex;gap:10px}
+.banner .pics>.pimg{width:110px;border:1px solid #cfe3d7;background:#fff;border-radius:6px}
+.tiles{display:grid;grid-template-columns:repeat(8,1fr);gap:10px}
+.tile{border:1px solid var(--line);border-radius:6px;background:#fff;padding:14px 6px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:13px;font-weight:500;text-align:center}
+.tile:hover{border-color:var(--brand);color:var(--brand)}
+.tile>.pimg{width:56px;background:var(--tint);border-radius:50%}
+.tile small{font-size:11.5px;color:var(--mute);font-weight:400;margin-top:-4px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.step{border:1px solid var(--line);border-radius:6px;padding:18px}
+.step b{display:block;margin-bottom:4px}
+.sellband{border:1px solid var(--line);border-radius:6px;padding:24px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.trust{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;border-top:1px solid var(--line);padding-top:24px}
+.trust b{display:block}
+
+/* product cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:16px}
+.card{display:flex;flex-direction:column;gap:6px;min-width:0}
+.card .imgb{position:relative;border:1px solid var(--line);border-radius:6px;background:var(--soft);aspect-ratio:1/1;display:block;width:100%;padding:0;overflow:hidden;cursor:pointer}
+.pimg{display:block;width:100%;height:auto}
+.imgb .pimg{position:absolute;inset:12%;width:76%;height:76%}
+.imgb img.ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.tag{position:absolute;left:8px;top:8px;background:var(--sale);color:#fff;font-size:12px;font-weight:700;padding:2px 7px;border-radius:3px}
+.tag.svc{background:var(--brand)}
+.heart{position:absolute;right:6px;top:6px;width:32px;height:32px;border-radius:50%;border:0;background:#fff;display:grid;place-items:center;color:var(--mute)}
+.heart.on{color:var(--sale)}
+.heart svg{width:18px;height:18px}
+.card .by{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);font-weight:600}
+.card .loc{font-size:12.5px;color:var(--mute)}
+.card .loc.here{color:var(--ok);font-weight:600}
+.card .t{font-size:14px;color:var(--ink);text-align:left;background:none;border:0;padding:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:3em;line-height:1.5}
+.card .t:hover{color:var(--brand);text-decoration:underline}
+.stars{color:var(--star);font-size:13px;letter-spacing:1px;white-space:nowrap}
+.price{font-weight:700;font-size:17px}
+.price small{font-size:12.5px;font-weight:500;color:var(--mute)}
+.was{color:var(--mute);text-decoration:line-through;font-size:13px;margin-left:6px;font-weight:400}
+
+/* list page */
+.lay{display:grid;grid-template-columns:230px 1fr;gap:28px;align-items:start}
+.filters summary{font-weight:700;padding:8px 0;cursor:pointer;list-style:none;border-bottom:1px solid var(--line)}
+.filters summary::-webkit-details-marker{display:none}
+.fg{border-bottom:1px solid var(--line);padding:14px 0}
+.fg h3{font-size:14px;margin-bottom:8px}
+.fg label{display:flex;gap:8px;align-items:center;padding:3px 0;font-size:14px;cursor:pointer}
+.fg .lnk{display:block;background:none;border:0;padding:3px 0;font-size:14px;text-align:left;color:var(--ink)}
+.fg .lnk.on{font-weight:700;color:var(--brand)}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 4px}
+.pill{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 14px;font-size:13.5px}
+.pill:hover{border-color:var(--brand)}
+.pill.on{border-color:var(--brand);color:var(--brand);font-weight:600;background:var(--tint)}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.bar select{border:1px solid var(--line);border-radius:4px;padding:7px 10px;background:#fff}
+.empty{padding:48px 0;text-align:center;color:var(--mute)}
+
+/* product page */
+.pd{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px}
+.gal .main{border:1px solid var(--line);border-radius:6px;background:var(--soft);aspect-ratio:1/1;position:relative;overflow:hidden}
+.gal .main .pimg{position:absolute;inset:14%;width:72%;height:72%}
+.gal .main img.ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.thumbs{display:flex;gap:10px;margin-top:10px}
+.thumbs div{width:72px;aspect-ratio:1/1;border:1px solid var(--line);border-radius:4px;background:var(--soft);position:relative;overflow:hidden;cursor:pointer}
+.thumbs div.on{border:2px solid var(--brand)}
+.thumbs .pimg{position:absolute;inset:14%;width:72%;height:72%}
+.info .price{font-size:30px}
+.info .box{border:1px solid var(--line);border-radius:6px;padding:14px;margin-top:14px;display:flex;flex-direction:column;gap:6px}
+.qty{border:1px solid var(--line);border-radius:4px;padding:10px;background:#fff}
+.ok{color:var(--ok);font-weight:600}
+table.sp{width:100%;border-collapse:collapse;font-size:14px}
+table.sp td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+table.sp td:first-child{color:var(--mute);width:38%;background:var(--soft)}
+.rev{border-top:1px solid var(--line);padding:14px 0}
+
+/* cart / checkout / forms */
+.two{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:28px;align-items:start}
+.panel{border:1px solid var(--line);border-radius:6px;padding:18px;background:#fff}
+.panel+.panel{margin-top:16px}
+.panel h2{font-size:18px;margin-bottom:12px}
+.line{display:grid;grid-template-columns:80px minmax(0,1fr) auto;gap:14px;padding:14px 0;border-top:1px solid var(--line);align-items:start}
+.line:first-of-type{border-top:0}
+.sum{display:flex;justify-content:space-between;padding:5px 0;gap:12px}
+.sum.t{font-weight:700;font-size:18px;border-top:1px solid var(--line);margin-top:8px;padding-top:12px}
+.fld{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.fld label{font-size:13px;font-weight:600}
+.fld input,.fld select,.fld textarea{border:1px solid #b5beb9;border-radius:4px;padding:10px 11px;background:#fff;width:100%}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--brand);outline:0;box-shadow:0 0 0 3px #cde7da}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:6px;padding:12px;margin-bottom:8px;cursor:pointer}
+.opt.on{border-color:var(--brand);background:var(--tint)}
+.err{background:#fdecea;border:1px solid #f0b9b1;color:#8a1d10;border-radius:4px;padding:10px 12px;margin-bottom:12px;font-size:14px}
+.note{background:#fff7e6;border:1px solid #f1d9a6;color:var(--warn);border-radius:4px;padding:10px 12px;font-size:14px;margin-bottom:12px}
+.info2{background:var(--tint);border:1px solid #cfe3d7;border-radius:4px;padding:10px 12px;font-size:14px;margin-top:10px}
+.auth{max-width:460px;margin:12px auto}
+.seg{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-bottom:16px}
+.seg button{border:0;background:#fff;padding:11px;font-weight:600;color:var(--mute)}
+.seg button.on{background:var(--brand);color:#fff}
+.stat{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
+.stat div{border:1px solid var(--line);border-radius:6px;padding:14px}
+.stat b{display:block;font-size:24px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:16px;overflow-x:auto}
+.tabs button{border:0;background:none;padding:11px 16px;font-weight:600;color:var(--mute);border-bottom:3px solid transparent;flex:none}
+.tabs button.on{color:var(--brand);border-bottom-color:var(--brand)}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{text-align:left;color:var(--mute);font-weight:600;padding:9px 10px;border-bottom:2px solid var(--line);white-space:nowrap}
+.tbl td{padding:10px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tblwrap{overflow-x:auto}
+.thumb{width:44px;height:44px;border:1px solid var(--line);border-radius:4px;background:var(--soft);position:relative;overflow:hidden;flex:none}
+.thumb .pimg{position:absolute;inset:12%;width:76%;height:76%}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.badge{display:inline-block;border-radius:3px;padding:2px 8px;font-size:12px;font-weight:700;background:var(--soft)}
+.badge.g{background:#e1f3e8;color:var(--ok)}
+.badge.b{background:#e4f0ea;color:var(--brand)}
+.badge.y{background:#fff1d6;color:var(--warn)}
+.badge.r{background:#fdecea;color:#8a1d10}
+.radiorow{display:flex;gap:18px;margin-bottom:12px;flex-wrap:wrap}
+.radiorow label{display:flex;gap:8px;align-items:center;font-weight:500;cursor:pointer}
+
+footer{background:var(--util);color:var(--util-ink);margin-top:40px;font-size:14px}
+footer .cols{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;padding-block:32px}
+footer h3{color:#fff;margin-bottom:10px;font-size:14px}
+footer button{display:block;background:none;border:0;padding:3px 0;color:var(--util-ink);text-align:left}
+footer button:hover{color:#fff;text-decoration:underline}
+footer .base{border-top:1px solid #254a36;padding-block:14px;font-size:12.5px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:6px;z-index:50;font-size:14px;display:flex;gap:14px;align-items:center;max-width:calc(100vw - 32px)}
+.toast button{background:none;border:0;color:#8fe0b4;font-weight:700;padding:0}
+
+@media (max-width:1100px){.tiles{grid-template-columns:repeat(4,1fr)}}
+@media (max-width:980px){
+  .lay{grid-template-columns:1fr}
+  .pd,.two{grid-template-columns:1fr}
+  .banner .pics{display:none}
+  footer .cols{grid-template-columns:repeat(2,1fr)}
+  .trust{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:640px){
+  .head .w{flex-wrap:wrap;gap:10px}
+  .sf{order:3;flex:1 0 100%}
+  .sf select{display:none}
+  .tools{margin-left:auto;gap:0}
+  .tool{padding:4px 7px}
+  .tool span{display:none}
+  .logo{font-size:20px}
+  .logo svg{width:26px;height:26px}
+  .head .w{gap:8px 4px}
+  .util .links a:nth-child(n+2),.util .links .hidem{display:none}
+  .banner{padding:22px 18px}
+  .banner h1{font-size:25px}
+  .tiles{grid-template-columns:repeat(4,1fr);gap:8px}
+  .steps,.stat{grid-template-columns:1fr}
+  .f2{grid-template-columns:1fr}
+  .grid{grid-template-columns:repeat(2,1fr);gap:12px}
+  .line{grid-template-columns:64px minmax(0,1fr)}
+  .line .after{grid-column:2}
+}
+</style>
+
+<div id="root"></div>
+
+<script>
+(function(){
+'use strict';
+var $=function(s,r){return (r||document).querySelector(s)};
+var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+var R=function(n){return 'R'+Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g,' ')};
+var plural=function(n,w){return n+' '+w+(n===1?'':'s')};
+
+/* ---------- pictures: flat catalogue-style placeholders (sellers upload real photos) ---------- */
+var N1='#d3d8d5',N2='#a9b2ac',W='#ffffff',DK='#2b2b2b',GR='#2e7d32';
+var SH={
+ logs:function(t){return '<rect x="12" y="68" width="70" height="26" rx="13" fill="'+t+'"/><circle cx="82" cy="81" r="13" fill="'+W+'" stroke="'+N2+'" stroke-width="3"/><circle cx="82" cy="81" r="5" fill="'+N1+'"/><rect x="34" y="36" width="70" height="26" rx="13" fill="'+t+'" opacity=".85"/><circle cx="104" cy="49" r="13" fill="'+W+'" stroke="'+N2+'" stroke-width="3"/><circle cx="104" cy="49" r="5" fill="'+N1+'"/>'},
+ sack:function(t){return '<path d="M36 20c10 7 38 7 48 0l9 24c4 22 3 46-6 64H33c-9-18-10-42-6-64z" fill="'+t+'"/><rect x="40" y="52" width="40" height="30" rx="4" fill="'+W+'" opacity=".92"/><rect x="46" y="60" width="24" height="5" rx="2" fill="'+N2+'"/><rect x="46" y="70" width="16" height="4" rx="2" fill="'+N1+'"/>'},
+ cow:function(t){return '<rect x="24" y="46" width="62" height="32" rx="14" fill="'+t+'"/><rect x="76" y="34" width="28" height="26" rx="9" fill="'+t+'"/><path d="M82 34l-6-11M99 34l6-11" stroke="'+N2+'" stroke-width="5" stroke-linecap="round"/><circle cx="96" cy="44" r="2.600" fill="'+W+'"/><rect x="30" y="74" width="9" height="28" rx="3" fill="'+t+'"/><rect x="70" y="74" width="9" height="28" rx="3" fill="'+t+'"/><path d="M25 54c-9 4-11 17-9 26" fill="none" stroke="'+t+'" stroke-width="5" stroke-linecap="round"/><ellipse cx="50" cy="58" rx="10" ry="7" fill="'+W+'" opacity=".7"/>'},
+ goat:function(t){return '<rect x="28" y="52" width="52" height="26" rx="12" fill="'+t+'"/><rect x="72" y="38" width="24" height="22" rx="9" fill="'+t+'"/><path d="M78 38c-2-10 4-16 8-16M92 38c2-10-2-16-6-16" fill="none" stroke="'+N2+'" stroke-width="4" stroke-linecap="round"/><path d="M90 60l-1 10" stroke="'+N2+'" stroke-width="4" stroke-linecap="round"/><circle cx="88" cy="47" r="2.400" fill="'+W+'"/><rect x="34" y="76" width="7" height="26" rx="3" fill="'+t+'"/><rect x="68" y="76" width="7" height="26" rx="3" fill="'+t+'"/>'},
+ hen:function(t){return '<ellipse cx="56" cy="68" rx="30" ry="24" fill="'+t+'"/><circle cx="84" cy="44" r="14" fill="'+t+'"/><path d="M97 44l13 4-13 4z" fill="'+N2+'"/><path d="M80 30q4-10 9 0q4-8 8 2" fill="none" stroke="#c9321f" stroke-width="5" stroke-linecap="round"/><circle cx="88" cy="42" r="2.200" fill="'+W+'"/><path d="M40 70q14 10 30 0" fill="none" stroke="'+W+'" stroke-width="4" opacity=".7"/><path d="M50 92l-4 15M64 92l4 15" stroke="'+N2+'" stroke-width="4" stroke-linecap="round"/>'},
+ seeds:function(t){return '<rect x="30" y="26" width="60" height="84" rx="4" fill="'+t+'"/><rect x="38" y="48" width="44" height="46" rx="3" fill="'+W+'" opacity=".93"/><path d="M60 88V68" stroke="'+GR+'" stroke-width="3"/><path d="M60 72c-9 0-13-7-13-13 9 0 13 5 13 13zM60 72c9 0 13-7 13-13-9 0-13 5-13 13z" fill="'+GR+'"/>'},
+ hoe:function(t){return '<path d="M28 104L88 26" stroke="#8a6a45" stroke-width="7" stroke-linecap="round"/><path d="M82 18l26 10-9 20-23-9z" fill="'+t+'"/>'},
+ sprayer:function(t){return '<rect x="32" y="30" width="48" height="74" rx="12" fill="'+t+'"/><rect x="45" y="19" width="22" height="13" rx="4" fill="'+N2+'"/><path d="M80 52c15 0 19 9 19 21v30" fill="none" stroke="'+N2+'" stroke-width="6" stroke-linecap="round"/><rect x="40" y="58" width="32" height="22" rx="3" fill="'+W+'" opacity=".9"/>'},
+ tomato:function(t){return '<circle cx="42" cy="72" r="24" fill="'+t+'"/><circle cx="80" cy="72" r="24" fill="'+t+'"/><circle cx="61" cy="44" r="24" fill="'+t+'"/><path d="M52 24l9 7 9-7M33 52l9 6 8-8M71 52l9 6 8-8" fill="none" stroke="'+GR+'" stroke-width="4" stroke-linecap="round"/>'},
+ leaf:function(t){return '<path d="M60 108V52" stroke="'+GR+'" stroke-width="5" stroke-linecap="round"/><path d="M60 82C30 80 18 58 24 32c26 2 38 22 36 50z" fill="'+t+'"/><path d="M60 82c30-2 42-24 36-50-26 2-38 22-36 50z" fill="'+t+'" opacity=".85"/><path d="M60 64C46 58 36 50 32 40M60 64c14-6 24-14 28-24" fill="none" stroke="'+W+'" stroke-width="2.500" opacity=".5"/>'},
+ mango:function(t){return '<ellipse cx="58" cy="70" rx="30" ry="38" transform="rotate(25 58 70)" fill="'+t+'"/><path d="M62 30c8-10 22-10 28-6-5 11-16 15-28 6z" fill="'+GR+'"/>'},
+ nut:function(t){return '<ellipse cx="48" cy="58" rx="28" ry="18" transform="rotate(-30 48 58)" fill="'+t+'"/><ellipse cx="74" cy="78" rx="28" ry="18" transform="rotate(-30 74 78)" fill="'+t+'"/><path d="M36 54l14-8M62 74l14-8" stroke="'+W+'" stroke-width="3" opacity=".55" stroke-linecap="round"/>'},
+ bricks:function(t){return '<g fill="'+t+'"><rect x="12" y="78" width="44" height="22" rx="2"/><rect x="60" y="78" width="44" height="22" rx="2"/><rect x="36" y="52" width="44" height="22" rx="2"/><rect x="84" y="52" width="24" height="22" rx="2"/><rect x="12" y="52" width="20" height="22" rx="2"/><rect x="12" y="26" width="44" height="22" rx="2" opacity=".85"/><rect x="60" y="26" width="44" height="22" rx="2" opacity=".85"/></g>'},
+ roof:function(t){return '<path d="M18 94L38 28h72L90 94z" fill="'+t+'"/><path d="M32 94l19-66M48 94l19-66M64 94l19-66M80 94l19-66" stroke="'+W+'" stroke-width="3" opacity=".55"/>'},
+ tractor:function(t){return '<rect x="26" y="52" width="60" height="24" rx="6" fill="'+t+'"/><rect x="56" y="28" width="30" height="30" rx="4" fill="'+t+'"/><rect x="61" y="33" width="20" height="14" rx="2" fill="'+W+'" opacity=".92"/><rect x="32" y="32" width="6" height="22" fill="'+N2+'"/><circle cx="36" cy="88" r="14" fill="'+DK+'"/><circle cx="36" cy="88" r="6" fill="'+N1+'"/><circle cx="88" cy="78" r="22" fill="'+DK+'"/><circle cx="88" cy="78" r="9" fill="'+N1+'"/>'},
+ tanker:function(t){return '<rect x="8" y="56" width="28" height="30" rx="4" fill="'+N2+'"/><rect x="36" y="40" width="74" height="42" rx="21" fill="'+t+'"/><path d="M73 50c6 8 9 12 9 16a9 9 0 0 1-18 0c0-4 3-8 9-16z" fill="'+W+'" opacity=".92"/><circle cx="26" cy="92" r="10" fill="'+DK+'"/><circle cx="76" cy="92" r="10" fill="'+DK+'"/><circle cx="98" cy="92" r="10" fill="'+DK+'"/>'},
+ tank:function(t){return '<rect x="30" y="26" width="60" height="80" rx="14" fill="'+t+'"/><ellipse cx="60" cy="30" rx="30" ry="9" fill="'+W+'" opacity=".35"/><path d="M60 54c9 11 13 17 13 23a13 13 0 0 1-26 0c0-6 4-12 13-23z" fill="'+W+'" opacity=".92"/>'},
+ pump:function(t){return '<rect x="26" y="52" width="54" height="42" rx="10" fill="'+t+'"/><circle cx="53" cy="73" r="13" fill="'+W+'" opacity=".92"/><circle cx="53" cy="73" r="5" fill="'+N2+'"/><rect x="80" y="64" width="28" height="12" rx="3" fill="'+N2+'"/><rect x="38" y="38" width="30" height="16" rx="3" fill="'+N2+'"/>'},
+ bakkie:function(t){return '<rect x="8" y="58" width="54" height="24" rx="3" fill="'+t+'"/><path d="M62 82V54h22l18 15v13z" fill="'+t+'"/><rect x="68" y="58" width="15" height="11" fill="'+W+'" opacity=".92"/><circle cx="30" cy="88" r="11" fill="'+DK+'"/><circle cx="88" cy="88" r="11" fill="'+DK+'"/>'},
+ truck:function(t){return '<rect x="6" y="38" width="66" height="46" rx="4" fill="'+t+'"/><path d="M72 84V50h24l16 18v16z" fill="'+N2+'"/><rect x="78" y="55" width="14" height="11" fill="'+W+'" opacity=".92"/><circle cx="26" cy="90" r="11" fill="'+DK+'"/><circle cx="54" cy="90" r="11" fill="'+DK+'"/><circle cx="94" cy="90" r="11" fill="'+DK+'"/>'}
+};
+function pic(p){
+  if(p.photo)return '<img class="ph" alt="'+esc(p.title)+'" src="'+p.photo+'">';
+  return '<svg class="pimg" viewBox="0 0 120 120" role="img" aria-label="'+esc(p.title)+'">'+SH[p.shape](p.tone)+'</svg>';
+}
+var PROTEA='<svg viewBox="0 0 32 32" aria-hidden="true"><g transform="translate(16 16)">'
+ +[0,30,60,90,120,150,180,210,240,270,300,330].map(function(a){return '<ellipse cx="0" cy="-10.500" rx="3.200" ry="9" fill="#d4577b" transform="rotate('+a+')"/>'}).join('')
+ +[15,45,75,105,135,165,195,225,255,285,315,345].map(function(a){return '<ellipse cx="0" cy="-7" rx="2.800" ry="6.500" fill="#f08aa8" transform="rotate('+a+')"/>'}).join('')
+ +'<circle r="5.200" fill="#f6d58b"/><circle r="2.400" fill="#e8a200"/></g></svg>';
+
+/* ---------- data ---------- */
+var AREAS=['Giyani Town','Giyani Section A','Giyani Section D','Mavalani','Nkuri','Dzumeri','Hlaneki','Xikundu','Homu','Muyexe','Gawula','Bambeni','Ndhuna','Mapayeni','Malamulele'];
+var DEPTS=[
+ {id:'fuel',name:'Firewood & Fuel',svc:false,subs:['Firewood','Charcoal & kindling'],shape:'logs',tone:'#8a5a2b'},
+ {id:'livestock',name:'Livestock',svc:false,subs:['Cattle','Goats & sheep','Poultry'],shape:'cow',tone:'#7a4b2a'},
+ {id:'farm',name:'Farming Supplies',svc:false,subs:['Seeds','Feed & fertiliser','Tools & sprayers'],shape:'seeds',tone:'#d9a441'},
+ {id:'produce',name:'Fresh Produce & Pantry',svc:false,subs:['Vegetables','Fruit','Dried & pantry'],shape:'tomato',tone:'#c9321f'},
+ {id:'building',name:'Building Materials',svc:false,subs:['Cement & bricks','Roofing & sand'],shape:'bricks',tone:'#b5532f'},
+ {id:'tractor',name:'Tractor Services',svc:true,subs:['Ploughing & planting','Tractor hire'],shape:'tractor',tone:'#c9321f'},
+ {id:'water',name:'Water Services',svc:true,subs:['Water delivery','Boreholes & pumps','Tanks'],shape:'tanker',tone:'#2f6fb5'},
+ {id:'transport',name:'Transport & Hire',svc:true,subs:['Bakkie & truck hire','Livestock transport'],shape:'bakkie',tone:'#5d6b7a'}
+];
+var DB={};DEPTS.forEach(function(d){DB[d.id]=d});
+var SELLERS={
+ s1:{id:'s1',name:'Chauke Farm & Fuel',village:'Nkuri',rate:4.8,sales:640},
+ s2:{id:'s2',name:'Baloyi Livestock',village:'Mavalani',rate:4.7,sales:210},
+ s3:{id:'s3',name:'Maluleke Tractor Hire',village:'Dzumeri',rate:4.9,sales:380},
+ s4:{id:'s4',name:'Shilubane Water Services',village:'Giyani Town',rate:4.8,sales:520},
+ s5:{id:'s5',name:'Nkuna Fresh Produce',village:'Hlaneki',rate:4.6,sales:300},
+ s6:{id:'s6',name:'Hlungwani Building Supplies',village:'Giyani Town',rate:4.5,sales:410},
+ s7:{id:'s7',name:'Ngobeni Seeds & Feed',village:'Xikundu',rate:4.7,sales:360},
+ s8:{id:'s8',name:'Mukhari Poultry',village:'Homu',rate:4.6,sales:190},
+ s9:{id:'s9',name:'Mabasa Transport',village:'Malamulele',rate:4.5,sales:270}
+};
+var P=[];var pid=1;
+function add(d,sub,s,title,price,unit,was,rate,n,shape,tone,desc,note){
+  P.push({id:pid++,dept:d,sub:sub,seller:s,type:DB[d].svc?'service':'good',title:title,price:price,unit:unit||'',was:was||0,rate:rate,n:n,shape:shape,tone:tone,desc:desc,note:note||'',stock:12+(pid*7)%40,t:pid});
+}
+var LV='Livestock is collected from the seller or delivered by the seller\'s own transport. The seller will phone you to agree a time.';
+add('fuel','Firewood','s1','Mopane firewood, 20kg bag',65,'',0,4.8,420,'logs','#8a5a2b','Dry mopane firewood, split and ready for the fire. Burns hot and long.');
+add('fuel','Firewood','s1','Firewood, bakkie load (about 1 ton)',650,'',0,4.8,310,'logs','#6b4a2f','Seasoned mixed hardwood, loaded and delivered by the seller\'s bakkie.','Delivered by the seller\'s bakkie. Loading is included in the price.');
+add('fuel','Charcoal & kindling','s1','Kindling bundle',25,'',0,4.6,260,'logs','#b9824a','Dry kindling to light a fire quickly.');
+add('fuel','Charcoal & kindling','s1','Charcoal, 10kg bag',120,'',150,4.7,190,'sack','#2b2b2b','Lump charcoal for braai and cooking.');
+add('livestock','Cattle','s2','Weaner calf, mixed breed (about 8 months)',6800,'',0,4.7,38,'cow','#7a4b2a','Healthy weaner calf, dipped and dosed. Viewing at the seller\'s kraal is welcome.',LV);
+add('livestock','Cattle','s2','Cow in calf, Nguni cross',13500,'',0,4.8,24,'cow','#3b2f2a','Strong Nguni cross cow, in calf, well suited to local grazing.',LV);
+add('livestock','Goats & sheep','s2','Goat, adult Boer cross',1900,'',0,4.6,64,'goat','#a9743f','Healthy adult goat. Suitable for breeding or the pot.',LV);
+add('livestock','Goats & sheep','s2','Sheep, adult Dorper cross',2300,'',0,4.6,41,'goat','#cfc4ad','Adult Dorper cross sheep, in good condition.',LV);
+add('livestock','Poultry','s8','Indigenous chicken, live',180,'',0,4.7,230,'hen','#8a5a2b','Free-range indigenous chicken. Hardy and tasty.','Collected from the seller in Homu or delivered by the seller.');
+add('livestock','Poultry','s8','Laying hens, pack of 5',650,'',0,4.6,88,'hen','#c46a4b','Five young laying hens, vaccinated.','Collected from the seller in Homu or delivered by the seller.');
+add('farm','Seeds','s7','Maize seed, 10kg',520,'',0,4.7,210,'seeds','#d9a441','Hybrid maize seed suited to dryland planting.');
+add('farm','Seeds','s7','Spinach (morogo) seed, 100g',35,'',0,4.6,300,'seeds','#2e7d32','Fast growing leafy greens for the home garden.');
+add('farm','Feed & fertiliser','s7','Fertiliser 2:3:2, 50kg',640,'',0,4.5,150,'sack','#16794c','General purpose fertiliser for vegetables and maize.');
+add('farm','Feed & fertiliser','s7','Layer mash chicken feed, 50kg',340,'',0,4.6,180,'sack','#d9a441','Complete feed for laying hens.');
+add('farm','Feed & fertiliser','s7','Cattle lick, 25kg',290,'',0,4.5,95,'sack','#8a5a2b','Mineral lick supplement for cattle and goats.');
+add('farm','Tools & sprayers','s7','Knapsack sprayer, 16 litre',450,'',520,4.4,120,'sprayer','#d9a441','Manual knapsack sprayer with adjustable nozzle.');
+add('farm','Tools & sprayers','s7','Garden hoe',120,'',0,4.6,260,'hoe','#5d6b7a','Strong steel hoe with a hardwood handle.');
+add('produce','Vegetables','s5','Fresh spinach (morogo), bunch',10,'',0,4.7,520,'leaf','#2e7d32','Fresh morogo picked on the day.');
+add('produce','Vegetables','s5','Tomatoes, 5kg box',95,'',0,4.5,210,'tomato','#c9321f','Firm red tomatoes from local growers.');
+add('produce','Fruit','s5','Mangoes, 5kg box',110,'',0,4.8,170,'mango','#e08a1e','Sweet seasonal mangoes.');
+add('produce','Dried & pantry','s5','Groundnuts (peanuts), 1kg',55,'',0,4.6,140,'nut','#b9824a','Raw groundnuts, shelled and cleaned.');
+add('produce','Dried & pantry','s5','Dried mopane worms, 500g',180,'',0,4.8,260,'sack','#6b4a2f','Sun-dried mopane worms (madora), cleaned and packed.');
+add('produce','Dried & pantry','s5','Maize meal, 12.5kg',145,'',0,4.6,330,'sack','#e0b84a','Fine white maize meal for pap.');
+add('building','Cement & bricks','s6','Cement, 50kg bag',125,'',0,4.6,310,'sack','#6b7280','Portland cement for building and plastering.');
+add('building','Cement & bricks','s6','Building bricks, 100',195,'',0,4.5,150,'bricks','#b5532f','Solid face bricks, sold per 100.','Heavy item. Delivered by the seller\'s truck. The seller will confirm the delivery fee.');
+add('building','Roofing & sand','s6','Roof sheet IBR, 3 metre',210,'',0,4.5,95,'roof','#6b7280','Galvanised IBR roof sheet, 3 metres.');
+add('building','Roofing & sand','s6','River sand, bakkie load',650,'',0,4.4,70,'bakkie','#a9743f','Clean river sand for building, delivered by bakkie.','Delivered by the seller\'s bakkie.');
+add('tractor','Ploughing & planting','s3','Ploughing with tractor',950,'per hectare',0,4.9,160,'tractor','#c9321f','Disc ploughing for your field or garden plot. Book early in the planting season.');
+add('tractor','Ploughing & planting','s3','Planting with tractor planter',650,'per hectare',0,4.8,95,'tractor','#16794c','Row planting for maize and beans. Bring your own seed or ask us to supply it.');
+add('tractor','Tractor hire','s3','Grass slashing',700,'per hectare',0,4.7,80,'tractor','#d9a441','Slashing for yards, fields and fire breaks.');
+add('tractor','Tractor hire','s3','Tractor and trailer, with driver',1800,'per day',0,4.8,110,'tractor','#5d6b7a','Tractor and trailer for carrying loads, with an experienced driver.');
+add('water','Water delivery','s4','Water tanker delivery, 5 000 litres',450,'per load',0,4.8,340,'tanker','#2f6fb5','Clean water delivered to your yard or tank within the Giyani area.');
+add('water','Boreholes & pumps','s4','Borehole drilling',420,'per metre',0,4.7,60,'pump','#5d6b7a','Borehole drilling and casing. A site visit is arranged before work starts.');
+add('water','Boreholes & pumps','s4','Pump installation, labour',1200,'per job',0,4.7,85,'pump','#16794c','Installation of electric or solar pumps. Pump supplied separately.');
+add('water','Boreholes & pumps','s4','Water leak repair call-out',350,'per call-out',0,4.6,120,'pump','#d9a441','Repair of leaking pipes and taps at your home or business.');
+add('water','Tanks','s4','Water tank, 5 000 litre (supplied)',5400,'',0,4.8,75,'tank','#2f6fb5','Strong 5 000 litre tank with a lid. Delivery arranged with the seller.','Heavy item. Delivered by the seller\'s truck. The seller will confirm the delivery fee.');
+add('transport','Bakkie & truck hire','s1','Bakkie hire with driver',450,'per trip',0,4.7,210,'bakkie','#5d6b7a','Local bakkie trips for firewood, furniture and building materials.');
+add('transport','Bakkie & truck hire','s9','Truck hire, 4 ton',2200,'per day',0,4.6,90,'truck','#34495e','Four ton truck with driver for moving loads and goods.');
+add('transport','Livestock transport','s9','Livestock transport',1200,'per trip',0,4.7,65,'truck','#7a4b2a','Safe transport for cattle, goats and sheep between villages and markets.');
+var PB={};P.forEach(function(p){PB[p.id]=p});
+
+/* ---------- state ---------- */
+var DEF=function(){return {dept:'',sub:'',q:'',areas:{},price:'any',rating:0,deals:false,sort:'pop'}};
+var st={page:'home',arg:{},cart:[],wish:{},user:null,orders:[],reqs:[],toast:null,area:'Giyani Town',f:DEF(),
+  authTab:'buyer',authMode:'login',authMsg:'',authNote:'',sell:{tab:'listings'},nextOrder:100246,nextReq:2043,err:[],co:{method:'deliver',pay:'cash'},thumb:0};
+st.orders=[
+ {id:'MC-100231',buyer:'tsakani@example.com',t:Date.now()-6*86400000,status:'Delivered',method:'deliver',pay:'Cash on delivery',delivery:60,ship:'Tsakani Baloyi, Giyani Section A. Near the clinic',items:[{pid:2,qty:1,price:650}],total:710},
+ {id:'MC-100238',buyer:'rudzani@example.com',t:Date.now()-2*86400000,status:'Processing',method:'deliver',pay:'Cash on delivery',delivery:60,ship:'Rudzani Mabunda, Hlaneki. Blue gate, opposite the spaza shop',items:[{pid:1,qty:3,price:65},{pid:4,qty:1,price:120}],total:375},
+ {id:'MC-100242',buyer:'ntsako@example.com',t:Date.now()-86400000,status:'Packed',method:'collect',pay:'Instant EFT',delivery:0,ship:'Ntsako Shivambu. Collecting from seller',items:[{pid:3,qty:4,price:25}],total:100}
+];
+st.reqs=[
+ {id:'SR-2041',buyer:'sipho@example.com',pid:37,name:'Sipho Mathonsi',phone:'0821234567',area:'Mavalani',date:'2026-10-27',details:'Need to move a wardrobe and two beds.',status:'New',t:Date.now()-86400000},
+ {id:'SR-2042',buyer:'lindiwe@example.com',pid:37,name:'Lindiwe Chabalala',phone:'0734567890',area:'Dzumeri',date:'2026-10-24',details:'Fetch building sand from the river.',status:'Confirmed',t:Date.now()-2*86400000}
+];
+
+/* ---------- helpers ---------- */
+function stars(r){var f=Math.round(r),s='';for(var i=1;i<=5;i++)s+=i<=f?'★':'☆';return '<span class="stars" aria-label="'+r.toFixed(1)+' out of 5">'+s+'</span>'}
+function pct(p){return p.was?Math.round((1-p.price/p.was)*100):0}
+function cartCount(){return st.cart.reduce(function(a,l){return a+l.qty},0)}
+function sellerOf(p){return SELLERS[p.seller]||{name:'Seller',village:'Giyani area',rate:4.5,sales:0}}
+function priceHtml(p,big){
+  if(p.type==='service')return '<span class="price">From '+R(p.price)+'</span> <small class="mute'+(big?'':' sm')+'">'+esc(p.unit)+'</small>';
+  return '<span class="price">'+R(p.price)+'</span>'+(p.was?'<span class="was">'+R(p.was)+'</span>':'');
+}
+/* delivery: per seller. Same village R30, other villages R60, free over R800 per seller. Livestock is arranged with the seller. */
+function deliveryFor(method,area){
+  if(method==='collect'||!st.cart.length)return {fee:0,arranged:false};
+  var g={};st.cart.forEach(function(l){var p=PB[l.id];(g[p.seller]=g[p.seller]||[]).push({p:p,l:l})});
+  var fee=0,arranged=false;
+  Object.keys(g).forEach(function(k){
+    var items=g[k],sub=items.reduce(function(a,x){return a+x.p.price*x.l.qty},0);
+    var live=items.every(function(x){return x.p.dept==='livestock'});
+    if(live){arranged=true;return}
+    if(sub>=800)return;
+    fee+=(SELLERS[k]&&SELLERS[k].village===area)?30:60;
+  });
+  return {fee:fee,arranged:arranged};
+}
+function cartTotals(method,area){var sub=0;st.cart.forEach(function(l){sub+=PB[l.id].price*l.qty});var d=deliveryFor(method||'deliver',area||st.area);return {sub:sub,del:d.fee,arranged:d.arranged,total:sub+d.fee}}
+function ico(n){var m={
+ heart:'<path d="M12 20s-7-4.400-7-10a4 4 0 0 1 7-2.600A4 4 0 0 1 19 10c0 5.600-7 10-7 10z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+ heartf:'<path d="M12 20s-7-4.400-7-10a4 4 0 0 1 7-2.600A4 4 0 0 1 19 10c0 5.600-7 10-7 10z" fill="currentColor"/>',
+ cart:'<path d="M3 4h3l2.400 11h10l2-8H7" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="10" cy="19.500" r="1.600" fill="currentColor"/><circle cx="17" cy="19.500" r="1.600" fill="currentColor"/>',
+ user:'<circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21a8 8 0 0 1 16 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+ orders:'<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 8h6M9 12h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'};
+ return '<svg viewBox="0 0 24 24" aria-hidden="true">'+m[n]+'</svg>'}
+function areaOpts(sel,blank){return (blank?'<option value="">Select</option>':'')+AREAS.map(function(a){return '<option'+(a===sel?' selected':'')+'>'+a+'</option>'}).join('')}
+
+/* ---------- views ---------- */
+function header(){
+  var u=st.user,n=cartCount(),wn=Object.keys(st.wish).length;
+  var opts='<option value="">All departments</option>'+DEPTS.map(function(d){return '<option value="'+d.id+'"'+(st.f.dept===d.id&&st.page==='list'?' selected':'')+'>'+d.name+'</option>'}).join('');
+  var dept=DEPTS.map(function(d,i){return (i===5?'<i class="sep"></i>':'')+'<button data-act="dept" data-id="'+d.id+'" class="'+(st.page==='list'&&st.f.dept===d.id?'on':'')+'">'+d.name+'</button>'}).join('');
+  return '<div class="flag" aria-hidden="true"><i style="background:#000"></i><i style="background:#ffb81c"></i><i style="background:#007749"></i><i style="background:#e03c31"></i><i style="background:#001489"></i></div>'
+   +'<div class="util"><div class="w"><label>Your area: <select data-chg="area" aria-label="Your area">'+areaOpts(st.area)+'</select></label><div class="links">'
+   +'<button data-act="go" data-p="sellinfo">Sell on MzansiConnect</button><button data-act="stub" class="hidem">Help</button>'
+   +(u?'<span class="hidem">Hi, '+esc(u.name.split(' ')[0])+'</span><button data-act="logout" class="hidem">Log out</button>':'<button data-act="auth" data-m="login" class="hidem">Log in</button><button data-act="auth" data-m="register" class="hidem">Register</button>')
+   +'</div></div></div>'
+   +'<header class="head"><div class="w"><button class="logo" data-act="go" data-p="home" aria-label="MzansiConnect home">'+PROTEA+'<span>Mzansi<b>Connect</b></span></button>'
+   +'<form class="sf" id="sf" role="search"><select id="sd" aria-label="Department">'+opts+'</select><input id="sq" type="search" placeholder="Search products and services" aria-label="Search" value="'+esc(st.page==='list'?st.f.q:'')+'"><button type="submit">Search</button></form>'
+   +'<div class="tools"><button class="tool" data-act="go" data-p="orders">'+ico('orders')+'<span>Orders</span></button>'
+   +'<button class="tool" data-act="'+(u?'account':'auth')+'" data-m="login">'+ico('user')+'<span>'+(u?'Account':'Log in')+'</span></button>'
+   +'<button class="tool" data-act="go" data-p="wish" aria-label="Wishlist">'+ico('heart')+'<span>Saved</span>'+(wn?'<i class="n">'+wn+'</i>':'')+'</button>'
+   +'<button class="tool" data-act="go" data-p="cart" aria-label="Cart">'+ico('cart')+'<span>Cart</span>'+(n?'<i class="n">'+n+'</i>':'')+'</button></div></div></header>'
+   +'<nav class="dept" aria-label="Departments"><div class="w">'+dept+'<button class="sell" data-act="go" data-p="sellinfo">Sell with us</button></div></nav>';
+}
+function footer(){
+  return '<footer><div class="w"><div class="cols">'
+   +'<div><h3>Shop</h3>'+DEPTS.slice(0,5).map(function(d){return '<button data-act="dept" data-id="'+d.id+'">'+d.name+'</button>'}).join('')+'</div>'
+   +'<div><h3>Services</h3>'+DEPTS.slice(5).map(function(d){return '<button data-act="dept" data-id="'+d.id+'">'+d.name+'</button>'}).join('')+'<button data-act="auth" data-m="register" data-t="seller">Offer a service</button></div>'
+   +'<div><h3>Sell</h3><button data-act="go" data-p="sellinfo">Sell on MzansiConnect</button><button data-act="auth" data-m="register" data-t="seller">Register as a seller</button><button data-act="stub">Seller guidelines</button></div>'
+   +'<div><h3>Help</h3><button data-act="stub">Delivery and collection</button><button data-act="stub">Payments</button><button data-act="stub">Contact us</button><button data-act="stub">Terms and privacy</button></div>'
+   +'</div><div class="base">© 2026 MzansiConnect. Serving Giyani and surrounding villages, Limpopo. Concept design: listings, sellers and prices are samples.</div></div></footer>';
+}
+function card(p){
+  var s=sellerOf(p),d=pct(p),here=s.village===st.area,svc=p.type==='service';
+  return '<article class="card"><div class="imgb" data-act="product" data-id="'+p.id+'">'+pic(p)
+   +(svc?'<span class="tag svc">Service</span>':(d?'<span class="tag">-'+d+'%</span>':''))
+   +'<button class="heart'+(st.wish[p.id]?' on':'')+'" data-act="wish" data-id="'+p.id+'" aria-label="'+(st.wish[p.id]?'Remove from saved':'Save for later')+'">'+ico(st.wish[p.id]?'heartf':'heart')+'</button></div>'
+   +'<div class="by ell">'+esc(s.name)+'</div>'
+   +'<button class="t" data-act="product" data-id="'+p.id+'">'+esc(p.title)+'</button>'
+   +'<div class="loc'+(here?' here':'')+'">'+(here?'In your area · ':'')+esc(s.village)+'</div>'
+   +'<div>'+stars(p.rate)+' <span class="mute sm">('+p.n+')</span></div>'
+   +'<div>'+priceHtml(p)+'</div>'
+   +(svc?'<button class="btn o sm" data-act="product" data-id="'+p.id+'">Request service</button>':'<button class="btn o sm" data-act="addcart" data-id="'+p.id+'">Add to cart</button>')+'</article>';
+}
+function rowSec(title,list,link,linkLabel){
+  return '<section class="sec"><div class="row between"><h2>'+title+'</h2>'+(link?'<button class="link" data-act="dept" data-id="'+link+'">'+(linkLabel||'See all')+'</button>':'')+'</div><div class="grid">'+list.map(card).join('')+'</div></section>';
+}
+function home(){
+  var area=function(a,b){return (SELLERS[b.seller].village===st.area?1:0)-(SELLERS[a.seller].village===st.area?1:0)||b.n-a.n};
+  var near=P.slice().sort(area).slice(0,6);
+  var live=P.filter(function(p){return p.dept==='livestock'}).slice(0,6);
+  var svc=P.filter(function(p){return p.type==='service'&&['tractor','water'].indexOf(p.dept)>-1}).sort(function(a,b){return b.n-a.n}).slice(0,6);
+  var fuel=P.filter(function(p){return p.dept==='fuel'||p.dept==='produce'}).sort(function(a,b){return b.n-a.n}).slice(0,6);
+  var tiles=DEPTS.map(function(d){return '<button class="tile" data-act="dept" data-id="'+d.id+'"><div class="pimg" style="aspect-ratio:1/1;position:relative"><svg class="pimg" viewBox="0 0 120 120" style="position:absolute;inset:14%;width:72%;height:72%">'+SH[d.shape]('#007749')+'</svg></div>'+d.name+(d.svc?'<small>Service</small>':'')+'</button>'}).join('');
+  return '<div class="w">'
+   +'<div class="banner"><div><h1>Buy and sell in Giyani and the villages around it</h1><p>Firewood, livestock, farming supplies, tractor and water services from sellers near you. Pay when it arrives. Got something to sell? Open your shop for free.</p><div class="row wrapx"><button class="btn" data-act="dept" data-id="">Browse everything</button><button class="btn o" data-act="go" data-p="sellinfo">Start selling</button></div></div>'
+   +'<div class="pics" aria-hidden="true">'+['logs','cow','tractor'].map(function(k,i){return '<div class="pimg" style="aspect-ratio:1/1;position:relative"><svg class="pimg" viewBox="0 0 120 120" style="position:absolute;inset:12%;width:76%;height:76%">'+SH[k](['#8a5a2b','#7a4b2a','#c9321f'][i])+'</svg></div>'}).join('')+'</div></div>'
+   +'<section class="sec"><div class="row between"><h2>Shop by department</h2></div><div class="tiles">'+tiles+'</div></section>'
+   +rowSec('Near '+esc(st.area),near,'')
+   +rowSec('Livestock',live,'livestock')
+   +rowSec('Tractor and water services',svc,'tractor','See tractor services')
+   +rowSec('Firewood and fresh produce',fuel,'fuel')
+   +'<section class="sec"><h2 style="margin-bottom:14px">How it works</h2><div class="steps"><div class="step"><b>1. Find what you need</b><span class="mute">Search or browse by department. Set your area to see sellers closest to you.</span></div><div class="step"><b>2. Order or request a service</b><span class="mute">Add products to your cart. For tractors, water and transport, send a request with your date and village.</span></div><div class="step"><b>3. Pay when it arrives</b><span class="mute">Choose cash on delivery or collection, or pay by instant EFT or card.</span></div></div></section>'
+   +'<section class="sec"><div class="sellband"><div><h2>Sell on MzansiConnect</h2><p class="mute" style="margin:6px 0 0;max-width:38em">Farmers, traders and service providers across Giyani can list products and services for free. We show them to buyers in your area and nearby villages.</p></div><button class="btn" data-act="go" data-p="sellinfo">How selling works</button></div></section>'
+   +'<section class="sec"><div class="trust"><div><b>Local sellers</b><span class="mute sm">Neighbours and businesses from Giyani and nearby villages</span></div><div><b>Pay on delivery</b><span class="mute sm">Cash on delivery or collection is always available</span></div><div><b>Delivery to villages</b><span class="mute sm">Sellers deliver to your village or you collect</span></div><div><b>Simple to use</b><span class="mute sm">English only, plain steps, no extras</span></div></div></section></div>';
+}
+function matches(p){
+  var f=st.f,q=f.q.trim().toLowerCase();
+  if(f.dept&&p.dept!==f.dept)return false;
+  if(f.sub&&p.sub!==f.sub)return false;
+  if(q){var s=sellerOf(p);var hay=(p.title+' '+p.desc+' '+s.name+' '+s.village+' '+DB[p.dept].name+' '+p.sub).toLowerCase();if(q.split(/\s+/).some(function(w){return hay.indexOf(w)<0}))return false}
+  var ks=Object.keys(f.areas).filter(function(k){return f.areas[k]});if(ks.length&&ks.indexOf(sellerOf(p).village)<0)return false;
+  if(f.price==='u200'&&!(p.price<200))return false;
+  if(f.price==='200'&&!(p.price>=200&&p.price<1000))return false;
+  if(f.price==='1000'&&!(p.price>=1000&&p.price<5000))return false;
+  if(f.price==='5000'&&!(p.price>=5000))return false;
+  if(f.rating&&p.rate<f.rating)return false;
+  if(f.deals&&!p.was)return false;
+  return true;
+}
+function list(){
+  var f=st.f,items=P.filter(matches);
+  items.sort({pop:function(a,b){return b.n-a.n},near:function(a,b){return (sellerOf(b).village===st.area?1:0)-(sellerOf(a).village===st.area?1:0)||b.n-a.n},lo:function(a,b){return a.price-b.price},hi:function(a,b){return b.price-a.price},neu:function(a,b){return b.t-a.t}}[f.sort]);
+  var d=f.dept?DB[f.dept]:null;
+  var title=f.q?'Results for “'+esc(f.q)+'”':(d?d.name:'All products and services');
+  var base=P.filter(function(p){return !f.dept||p.dept===f.dept});
+  var vill={};base.forEach(function(p){var v=sellerOf(p).village;vill[v]=(vill[v]||0)+1});
+  var wide=window.innerWidth>980;
+  var crumbs='<div class="crumbs"><button data-act="go" data-p="home">Home</button>'+(d?'<span>/</span>'+(f.sub?'<button data-act="dept" data-id="'+d.id+'">'+d.name+'</button><span>/</span>'+esc(f.sub):d.name):'<span>/</span>'+title)+'</div>';
+  var pills=d?'<div class="pills"><button class="pill'+(!f.sub?' on':'')+'" data-act="sub" data-v="">All</button>'+d.subs.map(function(s){return '<button class="pill'+(f.sub===s?' on':'')+'" data-act="sub" data-v="'+esc(s)+'">'+esc(s)+'</button>'}).join('')+'</div>':'';
+  var depLinks='<button class="lnk'+(!f.dept?' on':'')+'" data-act="dept" data-id="">All departments</button>'+DEPTS.map(function(x){return '<button class="lnk'+(f.dept===x.id?' on':'')+'" data-act="dept" data-id="'+x.id+'">'+x.name+'</button>'}).join('');
+  var prices=[['any','Any price'],['u200','Under R200'],['200','R200 to R999'],['1000','R1 000 to R4 999'],['5000','R5 000 and over']].map(function(o){return '<label><input type="radio" name="pr" data-chg="price" value="'+o[0]+'"'+(f.price===o[0]?' checked':'')+'> '+o[1]+'</label>'}).join('');
+  var rates=[[0,'Any rating'],[4.5,'4.5 stars and up'],[4,'4 stars and up']].map(function(o){return '<label><input type="radio" name="rt" data-chg="rating" value="'+o[0]+'"'+(f.rating===o[0]?' checked':'')+'> '+o[1]+'</label>'}).join('');
+  var sel=Object.keys(vill).sort().map(function(k){return '<label><input type="checkbox" data-chg="vill" value="'+esc(k)+'"'+(f.areas[k]?' checked':'')+'> '+esc(k)+' <span class="mute sm">('+vill[k]+')</span></label>'}).join('');
+  var aside='<details class="filters"'+(wide?' open':'')+'><summary>Filters</summary>'
+   +'<div class="fg"><h3>Department</h3>'+depLinks+'</div><div class="fg"><h3>Price</h3>'+prices+'</div><div class="fg"><h3>Sold from</h3>'+sel+'</div><div class="fg"><h3>Customer rating</h3>'+rates+'</div>'
+   +'<button class="link" data-act="clear" style="margin-top:12px">Clear all filters</button></details>';
+  return '<div class="w">'+crumbs+'<div class="bar"><h1>'+title+' <span class="mute sm" style="font-weight:400">('+plural(items.length,'result')+')</span></h1>'
+   +'<label class="sm">Sort by <select data-chg="sort"><option value="pop"'+(f.sort==='pop'?' selected':'')+'>Most popular</option><option value="near"'+(f.sort==='near'?' selected':'')+'>Closest to '+esc(st.area)+'</option><option value="lo"'+(f.sort==='lo'?' selected':'')+'>Price: low to high</option><option value="hi"'+(f.sort==='hi'?' selected':'')+'>Price: high to low</option><option value="neu"'+(f.sort==='neu'?' selected':'')+'>Newest</option></select></label></div>'
+   +pills+'<div class="lay" style="margin-top:14px"><aside>'+aside+'</aside><div>'
+   +(items.length?'<div class="grid">'+items.map(card).join('')+'</div>':'<div class="empty"><h2>Nothing found</h2><p>Try removing a filter or searching for something else.</p><button class="btn o" data-act="clear">Clear filters</button></div>')+'</div></div></div>';
+}
+function product(){
+  var p=PB[st.arg.id];if(!p)return '<div class="w empty">Not found.</div>';
+  var s=sellerOf(p),d=DB[p.dept],svc=p.type==='service';
+  var rel=P.filter(function(x){return x.dept===p.dept&&x.id!==p.id}).slice(0,6);
+  var revs=[['Tsakani B.',5,svc?'Arrived on the day we agreed and did a good job.':'Exactly as described. Fair price.'],['Rudzani M.',4,svc?'Good service. Phone the day before to confirm.':'Good quality. The seller called before delivery.'],['Ntsako S.',5,'The seller answered all my questions. Would use again.']];
+  var specs=[['Seller',s.name],['Sold from',s.village+', Greater Giyani'],['Department',d.name+' / '+p.sub],['Type',svc?'Service':'Product'],svc?['Price unit',p.unit]:['Condition',p.dept==='livestock'?'Live animal':(p.dept==='produce'?'Fresh or packed':'New')],['Listing code','MC-'+String(p.id).padStart(5,'0')]];
+  var thumbs='<div class="thumbs">'+[0,1,2].map(function(i){return '<div class="'+(st.thumb===i?'on':'')+'" data-act="thumb" data-i="'+i+'">'+(p.photo?'<img class="ph" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" src="'+p.photo+'" alt="">':'<svg class="pimg" viewBox="0 0 120 120">'+SH[p.shape](p.tone)+'</svg>')+'</div>'}).join('')+'</div>';
+  var buy=svc
+   ?'<div class="box"><div class="ok">Available in Giyani and surrounding villages</div><div class="sm">Send a request below. '+esc(s.name)+' will phone you to confirm the date and the final price.</div></div>'
+    +'<div class="panel" style="margin-top:16px" id="req"><h2>Request this service</h2>'+reqForm(p)+'</div>'
+   :'<div class="box"><div class="ok">In stock</div><div class="sm">'+(p.note?esc(p.note):'Delivered by the seller to your village, or you can collect from '+esc(s.village)+'.')+'</div><div class="sm mute">Delivery from R30 within the same village, R60 to other villages. Free on orders over R800 from one seller.</div></div>'
+    +'<div class="row" style="margin-top:16px"><select class="qty" id="qty" aria-label="Quantity">'+[1,2,3,4,5,6,7,8,9,10].map(function(n){return '<option>'+n+'</option>'}).join('')+'</select><button class="btn grow" data-act="addcart2" data-id="'+p.id+'">Add to cart</button><button class="btn o" data-act="wish" data-id="'+p.id+'">'+(st.wish[p.id]?'Saved':'Save')+'</button></div>';
+  return '<div class="w"><div class="crumbs"><button data-act="go" data-p="home">Home</button><span>/</span><button data-act="dept" data-id="'+d.id+'">'+d.name+'</button><span>/</span><button data-act="sub2" data-d="'+d.id+'" data-v="'+esc(p.sub)+'">'+esc(p.sub)+'</button></div>'
+   +'<div class="pd"><div class="gal"><div class="main">'+pic(p)+(pct(p)?'<span class="tag">-'+pct(p)+'%</span>':'')+'</div>'+thumbs+'<p class="mute sm" style="margin-top:8px">'+(p.photo?'Photo uploaded by the seller.':'Sample picture. Sellers upload their own photos.')+'</p></div>'
+   +'<div class="info"><div class="mute sm" style="text-transform:uppercase;letter-spacing:.05em;font-weight:600">'+esc(s.name)+' · '+esc(s.village)+'</div><h1 style="margin:4px 0 8px">'+esc(p.title)+'</h1>'
+   +'<div>'+stars(p.rate)+' <span class="mute sm">'+p.rate.toFixed(1)+' ('+plural(p.n,'review')+')</span></div>'
+   +'<div style="margin-top:12px">'+priceHtml(p,true)+(p.was?' <span class="badge r">Save '+R(p.was-p.price)+'</span>':'')+'</div>'
+   +buy
+   +'<div class="box" style="margin-top:16px"><b>Sold by '+esc(s.name)+'</b><div class="mute sm">'+esc(s.village)+' · '+s.rate.toFixed(1)+' seller rating · '+plural(s.sales,'sale')+'</div><div class="mute sm">The seller\'s phone number is shared with you after you '+(svc?'send a request':'place an order')+'.</div></div>'
+   +'</div></div>'
+   +'<section class="sec"><h2 style="margin-bottom:10px">Description</h2><p style="max-width:48em;margin:0">'+esc(p.desc)+'</p></section>'
+   +'<section class="sec"><h2 style="margin-bottom:10px">Details</h2><table class="sp" style="max-width:640px"><tbody>'+specs.map(function(r){return '<tr><td>'+r[0]+'</td><td>'+esc(r[1])+'</td></tr>'}).join('')+'</tbody></table></section>'
+   +'<section class="sec"><h2 style="margin-bottom:6px">Customer reviews</h2>'+revs.map(function(r){return '<div class="rev"><div class="row"><b>'+r[0]+'</b>'+stars(r[1])+'</div><div style="margin-top:2px">'+r[2]+'</div></div>'}).join('')+'</section>'
+   +(rel.length?rowSec('More in '+d.name,rel,''):'')+'</div>';
+}
+function reqForm(p){
+  var v=st.reqv||{},u=st.user;
+  return (st.err.length?'<div class="err" role="alert">'+st.err.map(esc).join('<br>')+'</div>':'')
+   +'<div class="f2"><div class="fld"><label for="r_name">Your name</label><input id="r_name" autocomplete="name" value="'+esc(v.name||(u?u.name:''))+'"></div><div class="fld"><label for="r_phone">Mobile number</label><input id="r_phone" type="tel" autocomplete="tel" placeholder="082 123 4567" value="'+esc(v.phone||'')+'"></div></div>'
+   +'<div class="f2"><div class="fld"><label for="r_area">Where is the work?</label><select id="r_area">'+areaOpts(v.area||st.area)+'</select></div><div class="fld"><label for="r_date">Preferred date</label><input id="r_date" type="date" value="'+esc(v.date||'')+'"></div></div>'
+   +'<div class="fld"><label for="r_det">Details (size of field, load, directions)</label><textarea id="r_det" rows="3">'+esc(v.details||'')+'</textarea></div>'
+   +'<button class="btn w100" data-act="sendreq" data-id="'+p.id+'">Send request</button><p class="mute sm" style="margin:8px 0 0">Sending a request is free. You only pay the provider after the work is done.</p>';
+}
+function wishPage(){
+  var items=P.filter(function(p){return st.wish[p.id]});
+  return '<div class="w"><h1 style="margin-bottom:14px">Saved items</h1>'+(items.length?'<div class="grid">'+items.map(card).join('')+'</div>':'<div class="empty">Nothing saved yet. Tap the heart on a product to save it.</div>')+'</div>';
+}
+function cart(){
+  if(!st.cart.length)return '<div class="w"><h1 style="margin-bottom:14px">Cart</h1><div class="empty"><p>Your cart is empty.</p><button class="btn" data-act="go" data-p="home">Continue shopping</button></div></div>';
+  var t=cartTotals('deliver',st.area);
+  var lines=st.cart.map(function(l){var p=PB[l.id],s=sellerOf(p);
+   return '<div class="line"><div class="imgb" style="border:1px solid var(--line);border-radius:4px;background:var(--soft);position:relative;overflow:hidden;aspect-ratio:1/1;cursor:default">'+pic(p)+'</div>'
+    +'<div><button class="link" style="font-weight:600;text-align:left" data-act="product" data-id="'+p.id+'">'+esc(p.title)+'</button><div class="mute sm">Sold by '+esc(s.name)+', '+esc(s.village)+'</div><button class="link sm" style="font-weight:500;margin-top:6px" data-act="remove" data-id="'+p.id+'">Remove</button></div>'
+    +'<div class="after" style="text-align:right"><div class="price">'+R(p.price*l.qty)+'</div><select class="qty" style="margin-top:6px" data-chg="cartqty" data-id="'+p.id+'" aria-label="Quantity">'+[1,2,3,4,5,6,7,8,9,10].map(function(n){return '<option'+(n===l.qty?' selected':'')+'>'+n+'</option>'}).join('')+'</select></div></div>'}).join('');
+  return '<div class="w"><h1 style="margin-bottom:14px">Cart ('+plural(cartCount(),'item')+')</h1><div class="two"><div class="panel">'+lines+'</div>'
+   +'<div class="panel"><h2>Order summary</h2><div class="sum"><span>Subtotal</span><span>'+R(t.sub)+'</span></div><div class="sum"><span>Delivery to '+esc(st.area)+'</span><span>'+(t.arranged&&!t.del?'Arranged with seller':(t.del?R(t.del):'Free'))+'</span></div>'
+   +'<p class="mute sm" style="margin:2px 0">Choose collection at checkout to skip delivery fees.</p><div class="sum t"><span>Total</span><span>'+R(t.total)+'</span></div><button class="btn w100" style="margin-top:12px" data-act="tocheckout">Proceed to checkout</button><button class="btn o w100" style="margin-top:8px" data-act="go" data-p="home">Continue shopping</button></div></div></div>';
+}
+function checkout(){
+  if(!st.cart.length)return cart();
+  var c=st.co,v=st.coVals||{};if(!v.c_area)v.c_area=st.area;st.coVals=v;
+  var t=cartTotals(c.method,v.c_area);
+  var fld=function(id,label,type,extra){return '<div class="fld"><label for="'+id+'">'+label+'</label><input id="'+id+'" type="'+(type||'text')+'" value="'+esc(v[id]||'')+'" '+(extra||'')+'></div>'};
+  var collect=c.method==='collect';
+  return '<div class="w"><div class="crumbs"><button data-act="go" data-p="cart">Cart</button><span>/</span>Checkout</div><h1 style="margin-bottom:14px">Checkout</h1>'
+   +(st.err.length?'<div class="err" role="alert"><b>Please fix the following:</b><ul style="margin:6px 0 0 18px;padding:0">'+st.err.map(function(e){return '<li>'+esc(e)+'</li>'}).join('')+'</ul></div>':'')
+   +'<div class="two"><div>'
+   +'<div class="panel"><h2>Your details</h2><div class="f2">'+fld('c_name','Full name','text','autocomplete="name"')+fld('c_phone','Mobile number','tel','autocomplete="tel" placeholder="082 123 4567"')+'</div>'
+   +'<div class="fld"><label for="c_area">Village or area</label><select id="c_area" data-chg="carea">'+areaOpts(v.c_area)+'</select></div>'
+   +'<div class="fld"><label for="c_dir">Directions to your home</label><textarea id="c_dir" rows="2" placeholder="For example: next to the clinic, blue gate, opposite the spaza shop">'+esc(v.c_dir||'')+'</textarea></div>'
+   +fld('c_stand','Stand or house number (optional)')+'<p class="mute sm" style="margin:0">Limpopo, Greater Giyani Municipality.</p></div>'
+   +'<div class="panel"><h2>Delivery or collection</h2><label class="opt'+(!collect?' on':'')+'"><input type="radio" name="dm" data-chg="method" value="deliver"'+(!collect?' checked':'')+'><span><b>Seller delivers to you</b><br><span class="mute sm">R30 in the same village, R60 to other villages, free over R800 per seller. Livestock delivery is arranged with the seller.</span></span></label>'
+   +'<label class="opt'+(collect?' on':'')+'"><input type="radio" name="dm" data-chg="method" value="collect"'+(collect?' checked':'')+'><span><b>I will collect</b><br><span class="mute sm">Collect from each seller\'s village. No delivery fee. The seller phones you with the pickup spot.</span></span></label></div>'
+   +'<div class="panel"><h2>Payment</h2>'+[['cash',collect?'Cash on collection':'Cash on delivery','Pay the seller when you receive your order'],['eft','Instant EFT','Pay from your bank account or eWallet'],['card','Debit or credit card','Pay securely online']].map(function(o){return '<label class="opt'+(c.pay===o[0]?' on':'')+'"><input type="radio" name="pm" data-chg="pay" value="'+o[0]+'"'+(c.pay===o[0]?' checked':'')+'><span><b>'+o[1]+'</b><br><span class="mute sm">'+o[2]+'</span></span></label>'}).join('')
+   +'<p class="mute sm" style="margin:6px 0 0">This is a concept: no payment is taken.</p></div></div>'
+   +'<div class="panel"><h2>Order summary</h2>'+st.cart.map(function(l){var p=PB[l.id];return '<div class="sum sm"><span>'+l.qty+' × '+esc(p.title)+'</span><span>'+R(p.price*l.qty)+'</span></div>'}).join('')
+   +'<div class="sum" style="border-top:1px solid var(--line);margin-top:8px;padding-top:10px"><span>Subtotal</span><span>'+R(t.sub)+'</span></div><div class="sum"><span>'+(collect?'Collection':'Delivery')+'</span><span>'+(t.arranged&&!t.del&&!collect?'Arranged with seller':(t.del?R(t.del):'Free'))+'</span></div><div class="sum t"><span>Total</span><span>'+R(t.total)+'</span></div>'
+   +'<button class="btn w100" style="margin-top:12px" data-act="place">Place order</button></div></div></div>';
+}
+function confirmPage(){
+  var o=st.orders.filter(function(x){return x.id===st.arg.id})[0];if(!o)return '';
+  return '<div class="w" style="max-width:720px"><div class="panel" style="margin-top:12px"><div class="badge g">Order received</div><h1 style="margin:10px 0 6px">Thank you for your order</h1><p class="mute" style="margin:0 0 14px">Your order number is <b style="color:var(--ink)">'+o.id+'</b>. The seller will phone you on the number you gave to arrange '+(o.method==='collect'?'collection':'delivery')+'.</p>'
+   +o.items.map(function(i){var p=PB[i.pid];return '<div class="sum sm"><span>'+i.qty+' × '+esc(p.title)+'</span><span>'+R(i.price*i.qty)+'</span></div>'}).join('')
+   +'<div class="sum t"><span>Total ('+esc(o.pay)+')</span><span>'+R(o.total)+'</span></div><p class="sm mute">'+esc(o.ship)+'</p><div class="row wrapx" style="margin-top:10px"><button class="btn" data-act="go" data-p="orders">View my orders</button><button class="btn o" data-act="go" data-p="home">Continue shopping</button></div></div></div>';
+}
+function statusBadge(s){var c={Processing:'y',New:'y',Packed:'b',Confirmed:'b',Shipped:'b',Delivered:'g',Completed:'g'}[s]||'';return '<span class="badge '+c+'">'+s+'</span>'}
+function ordersPage(){
+  if(!st.user)return authView('Log in to see your orders and requests.');
+  var mine=st.orders.filter(function(o){return o.buyer===st.user.email}).sort(function(a,b){return b.t-a.t});
+  var rq=st.reqs.filter(function(r){return r.buyer===st.user.email}).sort(function(a,b){return b.t-a.t});
+  return '<div class="w"><h1 style="margin-bottom:14px">My orders</h1>'+(mine.length?mine.map(function(o){return '<div class="panel"><div class="row between wrapx"><div><b>'+o.id+'</b> <span class="mute sm">· '+new Date(o.t).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'})+'</span></div>'+statusBadge(o.status)+'</div>'
+   +o.items.map(function(i){var p=PB[i.pid];return '<div class="row" style="margin-top:10px"><div class="thumb">'+pic(p)+'</div><div class="grow"><button class="link" style="font-weight:500;text-align:left" data-act="product" data-id="'+p.id+'">'+esc(p.title)+'</button><div class="mute sm">Qty '+i.qty+' · '+R(i.price*i.qty)+'</div></div></div>'}).join('')
+   +'<div class="sum t"><span>Total</span><span>'+R(o.total)+'</span></div></div>'}).join(''):'<div class="empty" style="padding:20px 0"><p>You have not placed any orders yet.</p><button class="btn" data-act="go" data-p="home">Start shopping</button></div>')
+   +(rq.length?'<h2 style="margin:28px 0 12px">Service requests</h2>'+rq.map(function(r){var p=PB[r.pid]||{title:'Service'};return '<div class="panel"><div class="row between wrapx"><div><b>'+r.id+'</b> <span class="mute sm">· '+esc(p.title)+'</span></div>'+statusBadge(r.status)+'</div><div class="mute sm" style="margin-top:6px">'+esc(r.area)+' · '+esc(r.date)+'</div></div>'}).join(''):'')+'</div>';
+}
+function authView(msg){
+  var seller=st.authTab==='seller',reg=st.authMode==='register';
+  return '<div class="w"><div class="panel auth"><h1 style="margin-bottom:6px">'+(reg?'Create your account':'Log in')+'</h1><p class="mute" style="margin:0 0 14px">'+(seller?'List your products or services for buyers in Giyani and nearby villages.':'Order from sellers near you and pay on delivery.')+'</p>'
+   +(msg?'<div class="note">'+esc(msg)+'</div>':'')+(st.authMsg?'<div class="err" role="alert">'+esc(st.authMsg)+'</div>':'')
+   +'<div class="seg" role="tablist"><button data-act="authtab" data-v="buyer" class="'+(!seller?'on':'')+'">I want to buy</button><button data-act="authtab" data-v="seller" class="'+(seller?'on':'')+'">I want to sell</button></div>'
+   +(reg?'<div class="fld"><label for="a_name">Full name</label><input id="a_name" autocomplete="name"></div>':'')
+   +(reg&&seller?'<div class="fld"><label for="a_biz">Business or shop name</label><input id="a_biz"></div><div class="fld"><label for="a_vil">Village or town</label><select id="a_vil">'+areaOpts('Giyani Town')+'</select></div>':'')
+   +'<div class="fld"><label for="a_email">Email address</label><input id="a_email" type="email" autocomplete="email"></div><div class="fld"><label for="a_pw">Password</label><input id="a_pw" type="password" autocomplete="'+(reg?'new-password':'current-password')+'"></div>'
+   +'<button class="btn w100" data-act="authgo">'+(reg?'Create account':'Log in')+'</button>'
+   +'<p class="sm" style="margin:14px 0 0;text-align:center">'+(reg?'Already have an account? <button class="link" data-act="authmode" data-v="login">Log in</button>':'New to MzansiConnect? <button class="link" data-act="authmode" data-v="register">Register</button>')+'</p>'
+   +'<p class="mute sm" style="margin:10px 0 0;text-align:center">Concept: any email and a password of 6+ characters will work.</p></div></div>';
+}
+function sellinfo(){
+  return '<div class="w"><div class="banner"><div><h1>Sell on MzansiConnect</h1><p>Farmers, traders and service providers in Giyani and the villages around it can list for free. Sell firewood, livestock and produce, or offer tractor, water and transport services.</p><button class="btn" data-act="auth" data-m="register" data-t="seller">Register as a seller</button></div></div>'
+   +'<section class="sec"><h2 style="margin-bottom:14px">How it works</h2><div class="steps"><div class="step"><b>1. Register your shop</b><span class="mute">Add your business name and your village. It takes about two minutes.</span></div><div class="step"><b>2. List what you offer</b><span class="mute">Add a product with its price and stock, or a service with its price per hectare, trip or day. Add a photo if you have one.</span></div><div class="step"><b>3. Get orders and requests</b><span class="mute">Buyers near you see your listing first. When an order or request comes in, you phone the buyer and agree the details.</span></div></div></section>'
+   +'<section class="sec"><div class="trust"><div><b>Free to list</b><span class="mute sm">No monthly fee to start</span></div><div><b>Buyers nearby</b><span class="mute sm">Your village and neighbouring villages see you first</span></div><div><b>Goods and services</b><span class="mute sm">Products, livestock, tractor work, water and transport</span></div><div><b>Easy to manage</b><span class="mute sm">Listings, orders and requests in one place</span></div></div></section></div>';
+}
+function sellerOrders(sid){return st.orders.filter(function(o){return o.items.some(function(i){return PB[i.pid]&&PB[i.pid].seller===sid})}).sort(function(a,b){return b.t-a.t})}
+function sellerReqs(sid){return st.reqs.filter(function(r){return PB[r.pid]&&PB[r.pid].seller===sid}).sort(function(a,b){return b.t-a.t})}
+function dashboard(){
+  var u=st.user,s=u&&u.sellerId?SELLERS[u.sellerId]:null;if(!s)return authView('Log in with a seller account to open the seller dashboard.');
+  var mine=P.filter(function(p){return p.seller===s.id});
+  var os=sellerOrders(s.id),rs=sellerReqs(s.id);
+  var toPack=os.filter(function(o){return o.status==='Processing'}).length;
+  var newReq=rs.filter(function(r){return r.status==='New'}).length;
+  var tab=st.sell.tab,body='';
+  if(tab==='listings')body='<div class="row between wrapx" style="margin-bottom:10px"><h2>Your listings ('+mine.length+')</h2><button class="btn sm" data-act="selltab" data-v="add">Add a listing</button></div>'
+   +(mine.length?'<div class="tblwrap"><table class="tbl"><thead><tr><th>Listing</th><th>Type</th><th>Price</th><th>Stock</th><th></th></tr></thead><tbody>'+mine.map(function(p){return '<tr><td><div class="row"><div class="thumb">'+pic(p)+'</div><button class="link" style="font-weight:500;text-align:left" data-act="product" data-id="'+p.id+'">'+esc(p.title)+'</button></div></td><td>'+(p.type==='service'?'Service':'Product')+'</td><td>'+(p.type==='service'?'From ':'')+R(p.price)+(p.unit?' <span class="mute sm">'+esc(p.unit)+'</span>':'')+'</td><td>'+(p.type==='service'?'-':p.stock)+'</td><td><button class="link sm" data-act="delp" data-id="'+p.id+'">Remove</button></td></tr>'}).join('')+'</tbody></table></div>':'<div class="empty"><p>You have no listings yet.</p><button class="btn" data-act="selltab" data-v="add">Add your first listing</button></div>');
+  if(tab==='orders')body='<h2 style="margin-bottom:10px">Orders</h2>'+(os.length?'<div class="tblwrap"><table class="tbl"><thead><tr><th>Order</th><th>Items</th><th>Buyer and directions</th><th>Your total</th><th>Status</th></tr></thead><tbody>'+os.map(function(o){var its=o.items.filter(function(i){return PB[i.pid]&&PB[i.pid].seller===s.id});var tot=its.reduce(function(a,i){return a+i.price*i.qty},0);
+   return '<tr><td><b>'+o.id+'</b><div class="mute sm">'+new Date(o.t).toLocaleDateString('en-ZA',{day:'numeric',month:'short'})+'</div></td><td>'+its.map(function(i){return i.qty+' × '+esc(PB[i.pid].title)}).join('<br>')+'</td><td class="sm">'+esc(o.ship)+'</td><td>'+R(tot)+'</td><td><select data-chg="ostatus" data-id="'+o.id+'" aria-label="Order status">'+['Processing','Packed','Shipped','Delivered'].map(function(x){return '<option'+(o.status===x?' selected':'')+'>'+x+'</option>'}).join('')+'</select></td></tr>'}).join('')+'</tbody></table></div>':'<div class="empty">No orders yet. They appear here when buyers order your products.</div>');
+  if(tab==='requests')body='<h2 style="margin-bottom:10px">Service requests</h2>'+(rs.length?'<div class="tblwrap"><table class="tbl"><thead><tr><th>Request</th><th>Service</th><th>Buyer</th><th>Where and when</th><th>Status</th></tr></thead><tbody>'+rs.map(function(r){return '<tr><td><b>'+r.id+'</b></td><td>'+esc(PB[r.pid].title)+'</td><td>'+esc(r.name)+'<div class="mute sm">'+esc(r.phone)+'</div></td><td class="sm">'+esc(r.area)+'<br>'+esc(r.date)+(r.details?'<br><span class="mute">'+esc(r.details)+'</span>':'')+'</td><td><select data-chg="rstatus" data-id="'+r.id+'" aria-label="Request status">'+['New','Confirmed','Completed'].map(function(x){return '<option'+(r.status===x?' selected':'')+'>'+x+'</option>'}).join('')+'</select></td></tr>'}).join('')+'</tbody></table></div>':'<div class="empty">No requests yet. They appear here when buyers request your services.</div>');
+  if(tab==='add'){var av=st.addv||{},dd=av.dept||'fuel',isSvc=DB[dd].svc;body='<h2 style="margin-bottom:10px">Add a listing</h2>'+(st.err.length?'<div class="err" role="alert">'+st.err.map(esc).join('<br>')+'</div>':'')
+   +'<div class="panel" style="max-width:640px"><div class="fld"><label for="p_title">Title</label><input id="p_title" value="'+esc(av.title||'')+'" maxlength="90" placeholder="For example: Ploughing with tractor"></div>'
+   +'<div class="f2"><div class="fld"><label for="p_dept">Department</label><select id="p_dept" data-chg="pdept">'+DEPTS.map(function(d){return '<option value="'+d.id+'"'+(dd===d.id?' selected':'')+'>'+d.name+'</option>'}).join('')+'</select></div>'
+   +'<div class="fld"><label for="p_sub">Category</label><select id="p_sub">'+DB[dd].subs.map(function(x){return '<option>'+x+'</option>'}).join('')+'</select></div></div>'
+   +'<div class="f2"><div class="fld"><label for="p_price">'+(isSvc?'Price from (R)':'Selling price (R)')+'</label><input id="p_price" type="number" min="1" step="1" inputmode="numeric" value="'+esc(av.price||'')+'"></div>'
+   +(isSvc?'<div class="fld"><label for="p_unit">Charged per</label><select id="p_unit">'+['hectare','hour','day','trip','metre','load','job','call-out'].map(function(x){return '<option>'+x+'</option>'}).join('')+'</select></div>':'<div class="fld"><label for="p_stock">Stock available</label><input id="p_stock" type="number" min="1" step="1" inputmode="numeric" value="'+esc(av.stock||'')+'"></div>')+'</div>'
+   +'<div class="fld"><label for="p_desc">Description</label><textarea id="p_desc" rows="4" maxlength="600">'+esc(av.desc||'')+'</textarea></div>'
+   +'<div class="fld"><label for="p_photo">Photo (optional)</label><input id="p_photo" type="file" accept="image/*"><span class="mute sm">A clear photo helps buyers trust your listing. Without a photo a sample picture is shown.</span></div>'
+   +'<p class="mute sm">Your listing will show "Sold from '+esc(s.village)+'".</p><button class="btn" data-act="saveprod">Publish listing</button></div>';}
+  return '<div class="w"><div class="row between wrapx"><div><h1>Seller dashboard</h1><div class="mute">'+esc(s.name)+' · '+esc(s.village)+'</div></div><button class="btn o" data-act="go" data-p="home">View the shop</button></div>'
+   +'<div class="stat"><div><b>'+mine.length+'</b><span class="mute sm">Active listings</span></div><div><b>'+toPack+'</b><span class="mute sm">Orders to pack</span></div><div><b>'+newReq+'</b><span class="mute sm">New service requests</span></div></div>'
+   +'<div class="tabs"><button class="'+(tab==='listings'?'on':'')+'" data-act="selltab" data-v="listings">Listings</button><button class="'+(tab==='orders'?'on':'')+'" data-act="selltab" data-v="orders">Orders'+(toPack?' ('+toPack+')':'')+'</button><button class="'+(tab==='requests'?'on':'')+'" data-act="selltab" data-v="requests">Requests'+(newReq?' ('+newReq+')':'')+'</button><button class="'+(tab==='add'?'on':'')+'" data-act="selltab" data-v="add">Add listing</button></div>'+body+'</div>';
+}
+
+/* ---------- render + events ---------- */
+function view(){
+  switch(st.page){
+   case 'home':return home();case 'list':return list();case 'product':return product();case 'cart':return cart();case 'checkout':return checkout();
+   case 'confirm':return confirmPage();case 'orders':return ordersPage();case 'wish':return wishPage();case 'auth':return authView(st.authNote||'');
+   case 'sellinfo':return sellinfo();case 'dash':return dashboard();
+  }return home();
+}
+function render(keep){
+  var y=window.pageYOffset;
+  $('#root').innerHTML=header()+'<main>'+view()+'</main>'+footer()+(st.toast?'<div class="toast" role="status">'+st.toast+'</div>':'');
+  if(keep)window.scrollTo(0,y);else window.scrollTo(0,0);
+}
+function go(p,arg){st.page=p;st.arg=arg||{};st.err=[];st.authMsg='';if(p!=='auth')st.authNote='';st.thumb=0;if(p!=='product')st.reqv=null;render()}
+function toast(html){st.toast=html;render(true);var t=html;setTimeout(function(){if(st.toast===t){st.toast=null;var el=$('.toast');if(el)el.remove()}},2800)}
+function addCart(id,q){var l=st.cart.filter(function(x){return x.id===id})[0];if(l)l.qty=Math.min(10,l.qty+q);else st.cart.push({id:id,qty:q})}
+function stashCo(){var v=st.coVals=st.coVals||{};['c_name','c_phone','c_area','c_dir','c_stand'].forEach(function(id){var el=$('#'+id);if(el)v[id]=el.value})}
+function readAdd(){return {title:($('#p_title')||{}).value,dept:($('#p_dept')||{}).value,price:($('#p_price')||{}).value,stock:($('#p_stock')||{}).value,desc:($('#p_desc')||{}).value}}
+function readReq(){return {name:($('#r_name')||{}).value,phone:($('#r_phone')||{}).value,area:($('#r_area')||{}).value,date:($('#r_date')||{}).value,details:($('#r_det')||{}).value}}
+
+document.addEventListener('submit',function(e){
+  if(e.target.id==='sf'){e.preventDefault();st.f=DEF();st.f.dept=$('#sd').value;st.f.q=$('#sq').value;go('list')}
+});
+document.addEventListener('change',function(e){
+  var t=e.target,c=t.dataset&&t.dataset.chg;if(!c)return;
+  if(c==='area'){st.area=t.value;render(true);return}
+  if(c==='price')st.f.price=t.value;
+  else if(c==='rating')st.f.rating=+t.value;
+  else if(c==='vill')st.f.areas[t.value]=t.checked;
+  else if(c==='sort')st.f.sort=t.value;
+  else if(c==='cartqty'){var l=st.cart.filter(function(x){return x.id===+t.dataset.id})[0];if(l)l.qty=+t.value}
+  else if(c==='method'||c==='pay'||c==='carea'){stashCo();if(c==='method')st.co.method=t.value;if(c==='pay')st.co.pay=t.value}
+  else if(c==='ostatus'){var o=st.orders.filter(function(x){return x.id===t.dataset.id})[0];if(o)o.status=t.value;toast('Order '+t.dataset.id+' marked '+t.value.toLowerCase());return}
+  else if(c==='rstatus'){var r=st.reqs.filter(function(x){return x.id===t.dataset.id})[0];if(r)r.status=t.value;toast('Request '+t.dataset.id+' marked '+t.value.toLowerCase());return}
+  else if(c==='pdept'){st.addv=readAdd();st.addv.dept=t.value;render(true);return}
+  render(true);
+});
+document.addEventListener('click',function(e){
+  var b=e.target.closest('[data-act]');if(!b)return;
+  var a=b.dataset.act,d=b.dataset;
+  switch(a){
+   case 'go':if((d.p==='orders'||d.p==='dash')&&!st.user)st.afterAuth=d.p;go(d.p);break;
+   case 'dept':st.f=DEF();st.f.dept=d.id||'';go('list');break;
+   case 'sub':st.f.sub=d.v;render(true);break;
+   case 'sub2':st.f=DEF();st.f.dept=d.d;st.f.sub=d.v;go('list');break;
+   case 'clear':var dp=st.f.dept;st.f=DEF();st.f.dept=dp;render(true);break;
+   case 'product':go('product',{id:+d.id});break;
+   case 'thumb':st.thumb=+d.i;render(true);break;
+   case 'wish':var id=+d.id;if(st.wish[id])delete st.wish[id];else st.wish[id]=true;render(true);break;
+   case 'addcart':addCart(+d.id,1);toast('Added to cart. <button data-act="go" data-p="cart">View cart</button>');break;
+   case 'addcart2':addCart(+d.id,+($('#qty')||{value:1}).value);toast('Added to cart. <button data-act="go" data-p="cart">View cart</button>');break;
+   case 'remove':st.cart=st.cart.filter(function(x){return x.id!==+d.id});render(true);break;
+   case 'tocheckout':if(!st.user){st.afterAuth='checkout';st.authTab='buyer';st.authMode='login';go('auth');st.authNote='Log in or register to complete your order.';render();break}go('checkout');break;
+   case 'place':placeOrder();break;
+   case 'sendreq':sendReq(+d.id);break;
+   case 'auth':st.authMode=d.m||'login';if(d.t)st.authTab=d.t;go('auth');break;
+   case 'authtab':st.authTab=d.v;st.authMsg='';render(true);break;
+   case 'authmode':st.authMode=d.v;st.authMsg='';render(true);break;
+   case 'authgo':authGo();break;
+   case 'account':if(st.user.sellerId)go('dash');else go('orders');break;
+   case 'logout':st.user=null;st.afterAuth=null;go('home');break;
+   case 'selltab':if(st.sell.tab==='add')st.addv=readAdd();st.sell.tab=d.v;st.err=[];render(true);break;
+   case 'delp':var i=P.findIndex(function(x){return x.id===+d.id});if(i>-1){P.splice(i,1);delete PB[+d.id];st.cart=st.cart.filter(function(x){return x.id!==+d.id})}render(true);break;
+   case 'saveprod':saveProduct();break;
+   case 'stub':toast('This page is not part of the concept yet');break;
+  }
+});
+function authGo(){
+  var reg=st.authMode==='register',seller=st.authTab==='seller';
+  var em=($('#a_email').value||'').trim().toLowerCase(),pw=$('#a_pw').value||'';
+  var name=reg?($('#a_name').value||'').trim():'';
+  var biz=reg&&seller?($('#a_biz').value||'').trim():'',vil=reg&&seller?$('#a_vil').value:'';
+  if(reg&&name.length<2){st.authMsg='Enter your full name.';return render(true)}
+  if(reg&&seller&&biz.length<2){st.authMsg='Enter your business or shop name.';return render(true)}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)){st.authMsg='Enter a valid email address.';return render(true)}
+  if(pw.length<6){st.authMsg='Your password must be at least 6 characters.';return render(true)}
+  var sid=null,nm=name||em.split('@')[0].replace(/^./,function(c){return c.toUpperCase()});
+  if(seller){
+    if(reg){sid='u'+Date.now();SELLERS[sid]={id:sid,name:biz,village:vil||'Giyani Town',rate:5,sales:0}}
+    else{sid='s1';nm='Risenga Chauke'}
+  }else if(!reg){nm='Tsakani Baloyi';em='tsakani@example.com'}
+  st.user={email:em,name:nm,role:seller?'seller':'buyer',sellerId:sid};
+  if(seller){st.sell.tab='listings';st.afterAuth=null;go('dash');return}
+  var next=st.afterAuth;st.afterAuth=null;if(next==='checkout')go('checkout');else if(next==='orders')go('orders');else go('home');
+}
+function placeOrder(){
+  stashCo();var v=st.coVals||{},errs=[];
+  [['c_name','Full name'],['c_phone','Mobile number'],['c_area','Village or area'],['c_dir','Directions to your home']].forEach(function(n){if(st.co.method==='collect'&&n[0]==='c_dir')return;if(!(v[n[0]]||'').trim())errs.push(n[1]+' is required.')});
+  if(v.c_phone&&!/^(\+27|0)\d{9}$/.test(v.c_phone.replace(/[\s-]/g,'')))errs.push('Enter a valid South African mobile number, for example 082 123 4567.');
+  if(errs.length){st.err=errs;render();return}
+  var t=cartTotals(st.co.method,v.c_area),collect=st.co.method==='collect';
+  var o={id:'MC-'+(st.nextOrder++),buyer:st.user.email,t:Date.now(),status:'Processing',method:st.co.method,pay:{cash:collect?'Cash on collection':'Cash on delivery',eft:'Instant EFT',card:'Card'}[st.co.pay],delivery:t.del,
+    ship:v.c_name+', '+v.c_area+(collect?'. Collecting from seller':'. '+v.c_dir+(v.c_stand?' (stand '+v.c_stand+')':'')),items:st.cart.map(function(l){return {pid:l.id,qty:l.qty,price:PB[l.id].price}}),total:t.sub+t.del};
+  st.orders.push(o);st.cart=[];st.err=[];go('confirm',{id:o.id});
+}
+function sendReq(pid){
+  if(!st.user){st.reqv=readReq();st.afterAuth=null;st.authTab='buyer';st.authMode='login';go('auth');st.authNote='Log in or register to send a service request.';render();return}
+  var v=readReq(),errs=[];st.reqv=v;
+  if((v.name||'').trim().length<2)errs.push('Enter your name.');
+  if(!/^(\+27|0)\d{9}$/.test((v.phone||'').replace(/[\s-]/g,'')))errs.push('Enter a valid South African mobile number, for example 082 123 4567.');
+  if(!v.date)errs.push('Choose a preferred date.');
+  else if(v.date<new Date().toISOString().slice(0,10))errs.push('The preferred date cannot be in the past.');
+  if(errs.length){st.err=errs;render(true);return}
+  var r={id:'SR-'+(st.nextReq++),buyer:st.user.email,pid:pid,name:v.name.trim(),phone:v.phone.trim(),area:v.area,date:v.date,details:(v.details||'').trim(),status:'New',t:Date.now()};
+  st.reqs.push(r);st.reqv=null;st.err=[];
+  $('#req').innerHTML='<div class="badge g">Request sent</div><h2 style="margin:10px 0 6px">'+esc(r.id)+'</h2><p class="mute" style="margin:0 0 12px">'+esc(sellerOf(PB[pid]).name)+' will phone you on '+esc(r.phone)+' to confirm the date and the price.</p><div class="row wrapx"><button class="btn sm" data-act="go" data-p="orders">View my requests</button><button class="btn o sm" data-act="go" data-p="home">Keep shopping</button></div>';
+}
+function saveProduct(){
+  var v=readAdd(),sub=($('#p_sub')||{}).value,unit=($('#p_unit')||{}).value,f=$('#p_photo').files&&$('#p_photo').files[0],errs=[];
+  var svc=DB[v.dept].svc;
+  if(!(v.title||'').trim())errs.push('Enter a title.');
+  if(!(+v.price>0))errs.push('Enter a price greater than R0.');
+  if(!svc&&!(+v.stock>=1))errs.push('Enter how many you have in stock.');
+  if(errs.length){st.addv=v;st.err=errs;render(true);return}
+  function finish(photo){
+    var s=SELLERS[st.user.sellerId],dep=DB[v.dept];
+    var p={id:pid++,dept:v.dept,sub:sub||dep.subs[0],seller:s.id,type:svc?'service':'good',title:v.title.trim(),price:Math.round(+v.price),unit:svc?(unit||'job'):'',was:0,rate:4.5,n:0,shape:dep.shape,tone:dep.tone,desc:(v.desc||'').trim()||'No description yet.',note:'',stock:svc?0:Math.round(+v.stock),t:pid,photo:photo||null};
+    P.push(p);PB[p.id]=p;st.addv=null;st.err=[];st.sell.tab='listings';render();toast('Published. It is now live in the shop. <button data-act="product" data-id="'+p.id+'">View</button>');
+  }
+  if(f){if(f.size>5*1024*1024){st.addv=v;st.err=['That photo is larger than 5 MB. Choose a smaller one.'];render(true);return}var r=new FileReader();r.onload=function(){finish(r.result)};r.onerror=function(){finish(null)};r.readAsDataURL(f)}else finish(null);
+}
+render();
+})();
+</script>

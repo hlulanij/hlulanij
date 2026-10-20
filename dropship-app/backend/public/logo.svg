@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="MzansiConnect">
+  <rect width="64" height="64" rx="14" fill="#111111"/>
+  <!-- a road winding away to the horizon: connection between villages and town -->
+  <path d="M10 62C10 42 40 40 30 10L40 10C52 40 24 44 40 62Z" fill="#ffffff"/>
+  <path d="M25 62C24 48 36 44 34 32C33 24 34 18 35 10" fill="none" stroke="#111111" stroke-width="2.4" stroke-dasharray="5 4.5" stroke-linecap="butt"/>
+</svg>

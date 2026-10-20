@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>DropIt</title>
+<meta name="theme-color" content="#e4002b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="DropIt">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<style>html,body{height:100%;margin:0;background:#f6f6f8;overflow:hidden}#root{display:flex;height:100%;flex:1}
+#bar{position:fixed;left:0;right:0;bottom:0;background:#15161d;color:#f3f3f6;font:13px/1.4 system-ui,sans-serif;padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));display:flex;gap:12px;align-items:center;justify-content:space-between;z-index:9}
+#bar button{font:inherit;border:0;background:transparent;color:#ff9aa9;font-weight:700;padding:4px 8px}
+#root{padding-bottom:0}</style>
+</head>
+<body>
+<div id="root"></div>
+<noscript>DropIt needs JavaScript.</noscript>
+<div id="bar" hidden><span id="msg"></span><button id="x" type="button">Hide</button></div>
+<script src="app.js" defer></script>
+<script>
+(function () {
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () {});
+  var standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  var bar = document.getElementById('bar'), msg = document.getElementById('msg');
+  document.getElementById('x').onclick = function () { bar.hidden = true; document.getElementById('root').style.paddingBottom = '0'; };
+  function show(t) { if (standalone) return; msg.textContent = t; bar.hidden = false; document.getElementById('root').style.paddingBottom = '44px'; }
+  var ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  if (ios) show('Install: tap Share, then Add to Home Screen.');
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault(); show('Install DropIt on this device.');
+    var b = document.createElement('button'); b.textContent = 'Install'; b.onclick = function () { e.prompt(); }; bar.insertBefore(b, document.getElementById('x'));
+  });
+})();
+</script>
+</body>
+</html>

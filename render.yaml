@@ -1,0 +1,21 @@
+# One-click deploy: Render > New > Blueprint > pick this repo. Free plan, preview mode.
+# To launch for real: remove DEMO_SEED and ALLOW_MOCK_PAYMENTS, add the PEACH_* variables, and move to a paid
+# instance with a disk mounted at /data (set DB_PATH=/data/data.sqlite) so seller accounts and orders survive restarts.
+services:
+  - type: web
+    name: dropit-api
+    runtime: docker
+    dockerContext: ./dropship-app/backend
+    dockerfilePath: ./dropship-app/backend/Dockerfile
+    plan: free
+    branch: claude/trusting-turing-2xgi7q
+    healthCheckPath: /health
+    envVars:
+      - key: JWT_SECRET
+        generateValue: true
+      - key: PUBLIC_URL        # the API's own public address (card checkout page and webhooks use it)
+        value: https://dropit-api.onrender.com
+      - key: DEMO_SEED          # creates demo accounts on every boot; remove for real use
+        value: "1"
+      - key: ALLOW_MOCK_PAYMENTS # no real charges; remove once Peach credentials are set
+        value: "1"

@@ -1,0 +1,8 @@
+{
+  "cli": { "version": ">= 12.0.0" },
+  "build": {
+    "preview": { "distribution": "internal", "android": { "buildType": "apk" }, "env": { "EXPO_PUBLIC_API_URL": "https://YOUR-BACKEND-URL" } },
+    "production": { "autoIncrement": true, "env": { "EXPO_PUBLIC_API_URL": "https://YOUR-BACKEND-URL" } }
+  },
+  "submit": { "production": {} }
+}
