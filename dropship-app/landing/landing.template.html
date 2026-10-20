@@ -1,0 +1,299 @@
+<title>DropIt</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@500&display=swap">
+<style>
+/* Layout: full-width bands, 1080px inner column. Hero pairs headline with one phone; sample screens sit in a scroll row. */
+:root{
+  --bg:#fbfbfc; --surface:#ffffff; --fg:#17171c; --mute:#5d5d68; --line:#e3e3e8;
+  --accent:#d6001f; --accent-fg:#ffffff; --deep:#15161d; --deep-fg:#f3f3f6; --deep-mute:#a9a9b6; --ok:#12804a;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif; --f-body:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --f-mono:"DM Mono",ui-monospace,Menlo,Consolas,monospace;
+  /* sample app screens always render the app's own light theme */
+  --ph-bg:#f6f6f8; --ph-card:#ffffff; --ph-ink:#1b1b1f; --ph-mute:#6b6b76; --ph-red:#e4002b; --ph-ok:#1a8f4d; --ph-line:#e2e2e8;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1014;--surface:#17181e;--fg:#f1f1f4;--mute:#a3a3b0;--line:#2b2c35;--accent:#ff4d66;--accent-fg:#16161a;--deep:#08080b;--deep-fg:#f3f3f6;--deep-mute:#9e9eab;--ok:#4cc88a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1014;--surface:#17181e;--fg:#f1f1f4;--mute:#a3a3b0;--line:#2b2c35;--accent:#ff4d66;--accent-fg:#16161a;--deep:#08080b;--deep-fg:#f3f3f6;--deep-mute:#9e9eab;--ok:#4cc88a;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.55}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);line-height:1.04;letter-spacing:-.02em;text-wrap:balance;margin:0}
+h1{font-size:clamp(2.5rem,7vw,4.6rem);font-weight:800}
+h2{font-size:clamp(1.8rem,4.4vw,2.8rem);font-weight:800}
+h3{font-size:1.25rem;font-weight:600;letter-spacing:-.01em}
+p{margin:0}
+.eyebrow{font-family:var(--f-mono);font-size:.78rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent)}
+.lead{font-size:1.15rem;color:var(--mute);max-width:34em}
+.btn{display:inline-flex;align-items:center;gap:.5em;padding:.85em 1.4em;border-radius:12px;font-weight:700;text-decoration:none;border:2px solid var(--accent);background:var(--accent);color:var(--accent-fg)}
+.btn.ghost{background:transparent;color:var(--fg);border-color:var(--line)}
+.btn:hover{filter:brightness(1.07)}
+
+/* nav */
+.nav{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:18px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:1.6rem;letter-spacing:-.03em;text-decoration:none}
+.brand i{font-style:normal;color:var(--accent)}
+.nav nav{display:flex;gap:18px;font-size:.95rem;flex-wrap:wrap;justify-content:flex-end}
+.nav nav a{text-decoration:none;color:var(--mute)}
+.nav nav a:hover{color:var(--fg)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center;padding-block:36px 64px}
+.hero .lead{margin-top:20px}
+.cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.hero .meta{margin-top:26px;font-family:var(--f-mono);font-size:.8rem;color:var(--mute);display:flex;gap:18px;flex-wrap:wrap}
+.hero > *{min-width:0}
+.stage{display:flex;justify-content:center}
+
+/* phone mockups */
+.phone{width:248px;flex:none;border-radius:34px;border:7px solid var(--deep);background:var(--ph-bg);color:var(--ph-ink);overflow:hidden;font-size:12.5px;line-height:1.35;box-shadow:0 18px 40px -18px rgba(0,0,0,.45)}
+.phone .bar{height:22px;background:var(--ph-bg);display:flex;justify-content:center;align-items:center}
+.phone .bar::after{content:"";width:64px;height:6px;border-radius:4px;background:var(--ph-line)}
+.scr{padding:6px 12px 14px;display:flex;flex-direction:column;gap:8px;min-height:430px}
+.scr h4{margin:2px 0 0;font:800 16px/1.1 var(--f-display);letter-spacing:-.01em}
+.scr small{color:var(--ph-mute);font-size:11px}
+.pcard{background:var(--ph-card);border-radius:11px;padding:9px 11px;display:flex;flex-direction:column;gap:2px}
+.pcard b{font-weight:700}
+.row{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:var(--ph-card);border-radius:9px;padding:6px 9px;font-weight:700;font-size:11.5px}
+.chip.on{color:var(--ph-red)}
+.pbtn{background:var(--ph-red);color:#fff;text-align:center;font-weight:700;padding:9px;border-radius:9px;margin-top:2px}
+.pbtn.ghost{background:transparent;color:var(--ph-red);border:1px solid var(--ph-red)}
+.tabs{display:flex;margin-top:auto;border-top:1px solid var(--ph-line);margin-inline:-12px;margin-bottom:-14px;background:var(--ph-card)}
+.tabs span{flex:1;text-align:center;padding:9px 0;color:var(--ph-mute);font-weight:700;font-size:11.5px}
+.tabs span.on{color:var(--ph-red);box-shadow:inset 0 2px 0 var(--ph-red)}
+.step{display:flex;gap:9px;align-items:center;color:var(--ph-mute)}
+.step::before{content:"";width:12px;height:12px;border-radius:50%;border:2px solid var(--ph-line);flex:none}
+.step.done{color:var(--ph-ink)}
+.step.done::before{background:var(--ph-ok);border-color:var(--ph-ok)}
+.step.now{color:var(--ph-ok);font-weight:700}
+.step.now::before{border-color:var(--ph-ok);box-shadow:0 0 0 3px rgba(26,143,77,.2)}
+.ok{color:var(--ph-ok);font-weight:700}
+.mono{font-family:var(--f-mono);font-size:11px}
+
+/* bands */
+section{padding-block:72px}
+.head{display:flex;flex-direction:column;gap:12px;margin-bottom:36px}
+.head .lead{margin-top:2px}
+
+/* services */
+.services{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.svc{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.svc .tag{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
+.svc p{color:var(--mute);font-size:.95rem}
+.svc.big{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.svc.big p,.svc.big .tag{color:inherit;opacity:.9}
+
+/* screens row */
+.screens{background:var(--deep);color:var(--deep-fg)}
+.screens .lead{color:var(--deep-mute)}
+.screens .eyebrow{color:var(--deep-fg);opacity:.8}
+.row-scroll{display:flex;gap:26px;overflow-x:auto;padding:6px 4px 24px;scroll-snap-type:x proximity}
+.shot{display:flex;flex-direction:column;gap:14px;scroll-snap-align:start;flex:0 0 auto}
+.shot figcaption{font-size:.9rem;color:var(--deep-mute);max-width:248px}
+.shot figcaption b{display:block;color:var(--deep-fg);font-family:var(--f-display);font-size:1.05rem;margin-bottom:2px}
+figure{margin:0}
+
+/* roles */
+.roles{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.role{border-top:3px solid var(--fg);padding-top:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.role ul{margin:0;padding-left:1.1em;color:var(--mute);display:flex;flex-direction:column;gap:6px}
+
+/* dropship */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center}
+.split > *{min-width:0}
+.ledger{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;font-family:var(--f-mono);font-size:.9rem;display:flex;flex-direction:column;gap:10px}
+.ledger .r{display:flex;justify-content:space-between;gap:12px}
+.ledger .r.t{border-top:1px dashed var(--line);padding-top:10px;color:var(--ok);font-weight:500}
+.ledger .n{color:var(--mute);font-family:var(--f-body);font-size:.85rem}
+
+/* live */
+.live{border-top:1px solid var(--line)}
+.livegrid{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:40px;align-items:start}
+.steps{display:flex;flex-direction:column;gap:14px;margin-top:20px;padding:0;list-style:none}
+.steps li{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;color:var(--mute)}
+.steps li b{color:var(--fg)}
+#frame{width:100%;max-width:400px;height:min(780px,88vh);border:7px solid var(--deep);border-radius:36px;overflow:hidden;background:#f6f6f8;display:flex;box-shadow:0 18px 40px -18px rgba(0,0,0,.45);margin-inline:auto}
+#root{display:flex;flex:1;min-width:0;height:100%}
+
+footer{border-top:1px solid var(--line);padding-block:32px;color:var(--mute);font-size:.9rem}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+@media (max-width:860px){
+  .hero,.split,.livegrid{grid-template-columns:1fr}
+  .services,.roles{grid-template-columns:1fr 1fr}
+  .stage{order:-1}
+  section{padding-block:52px}
+}
+@media (max-width:560px){
+  .services,.roles{grid-template-columns:1fr}
+  .nav nav a:not(.keep){display:none}
+}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style>
+
+<header class="wrap nav">
+  <a class="brand" href="#top">Drop<i>It</i></a>
+  <nav aria-label="Sections">
+    <a href="#services">Services</a><a href="#screens">The app</a><a href="#sell">Sell</a><a href="#drive">Drive</a><a class="keep" href="#try"><b>Try it live</b></a>
+  </nav>
+</header>
+
+<main id="top">
+  <div class="wrap hero">
+    <div>
+      <p class="eyebrow">Delivery marketplace</p>
+      <h1 style="margin-top:14px">From the corner store to your front door.</h1>
+      <p class="lead">Order food, groceries, medicine, shopping and parcels from stores near you. Local drivers bring it. Stores and sellers run their own shop from the same app.</p>
+      <div class="cta">
+        <a class="btn" href="#try">Try the live app</a>
+        <a class="btn ghost" href="#screens">See the screens</a>
+      </div>
+      <div class="meta"><span>iPhone and Android</span><span>Cash or card</span><span>Preview build</span></div>
+    </div>
+    <div class="stage" aria-hidden="true">
+      <div class="phone"><div class="bar"></div>
+        <div class="scr">
+          <small>Deliver to</small>
+          <h4>10 Long Street</h4>
+          <div class="chips"><span class="chip on">Food</span><span class="chip">Groceries</span><span class="chip">Pharmacy</span><span class="chip">Liquor</span><span class="chip">Shopping</span></div>
+          <h4 style="margin-top:6px">Near you</h4>
+          <div class="pcard"><div class="row"><b>Burger Joint</b><span class="ok">4.7</span></div><small>0.1 km · Open now</small></div>
+          <div class="pcard"><div class="row"><b>Mama Africa Kitchen</b><span class="ok">4.5</span></div><small>0.6 km · Open now</small></div>
+          <div class="pcard"><div class="row"><b>Bunny Chow Co.</b><span class="ok">4.6</span></div><small>1.4 km · Open now</small></div>
+          <div class="tabs"><span class="on">Browse</span><span>Parcel</span><span>Orders</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section id="services" class="wrap">
+    <div class="head">
+      <p class="eyebrow">Services</p>
+      <h2>One app for everything you need delivered.</h2>
+    </div>
+    <div class="services">
+      <article class="svc"><span class="tag">Hot and fresh</span><h3>Food</h3><p>Restaurants and takeaways near you, with a live price quote before you order.</p></article>
+      <article class="svc"><span class="tag">Weekly shop</span><h3>Groceries</h3><p>Milk, bread and the rest from local supermarkets and corner shops.</p></article>
+      <article class="svc"><span class="tag">When it can't wait</span><h3>Pharmacy</h3><p>Over-the-counter essentials from pharmacies in your area.</p></article>
+      <article class="svc"><span class="tag">After work</span><h3>Liquor</h3><p>Wine, beer and spirits from licensed local stores.</p></article>
+      <article class="svc big"><span class="tag">Dropshipped</span><h3>Shopping</h3><p>Gadgets and gifts from sellers who ship from their suppliers, so more stock reaches you.</p></article>
+      <article class="svc"><span class="tag">Point to point</span><h3>Parcels</h3><p>Send a package across the city with a courier. Enter pickup and drop-off, and pay.</p></article>
+    </div>
+  </section>
+
+  <section id="screens" class="screens">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">Sample designs</p>
+        <h2>Three roles, one app.</h2>
+        <p class="lead">Customers order, stores prepare, drivers deliver. These are the screens each of them sees.</p>
+      </div>
+      <div class="row-scroll" role="group" aria-label="Sample app screens">
+        <figure class="shot"><div class="phone"><div class="bar"></div><div class="scr">
+            <h4>Burger Joint</h4>
+            <div class="pcard"><b>Classic Burger</b><small>R89.00</small><div class="row"><span class="chip on">−</span><b>2</b><span class="pbtn" style="padding:5px 12px;margin:0">+</span></div></div>
+            <div class="pcard"><b>Chips</b><small>R32.00</small><div class="row"><span class="chip on">−</span><b>0</b><span class="pbtn" style="padding:5px 12px;margin:0">+</span></div></div>
+            <div class="pcard">
+              <div class="row"><small>Items</small><span class="mono">R178.00</span></div>
+              <div class="row"><small>Delivery</small><span class="mono">R21.00</span></div>
+              <div class="row"><small>Service</small><span class="mono">R8.90</span></div>
+              <div class="row"><b>Total</b><b class="mono">R207.90</b></div>
+              <div class="chips" style="margin-top:6px"><span class="chip on">cash</span><span class="chip">card</span></div>
+              <div class="pbtn">Place order</div>
+            </div></div></div>
+          <figcaption><b>Order with a clear total</b>Items, delivery and service fee are quoted before you pay.</figcaption></figure>
+
+        <figure class="shot"><div class="phone"><div class="bar"></div><div class="scr">
+            <h4>Your orders</h4>
+            <div class="pcard">
+              <b>#1042 · Store order · R207.90</b>
+              <div style="display:flex;flex-direction:column;gap:7px;margin:8px 0 4px">
+                <span class="step done">Placed</span><span class="step done">Accepted</span><span class="step now">Preparing</span>
+                <span class="step">Ready</span><span class="step">Picked up</span><span class="step">Delivered</span>
+              </div>
+              <div class="pbtn ghost">Cancel</div>
+            </div>
+            <div class="pcard"><b>#1039 · Parcel · R48.00</b><span class="ok">delivered</span><div class="pbtn ghost" style="margin-top:6px">Rate 5 stars</div></div>
+            <div class="tabs"><span>Browse</span><span>Parcel</span><span class="on">Orders</span></div>
+          </div></div>
+          <figcaption><b>Follow every step</b>Status updates as the store and the driver move your order along.</figcaption></figure>
+
+        <figure class="shot"><div class="phone"><div class="bar"></div><div class="scr">
+            <h4>Incoming orders</h4>
+            <div class="pcard"><b>#1043 · R178.00 · placed</b><small>2× Classic Burger</small><div class="pbtn">Mark accepted</div><div class="pbtn ghost">Reject</div></div>
+            <div class="pcard"><b>#1041 · R98.00 · preparing</b><small>1× Cheese Burger, 1× Chips</small><div class="pbtn">Mark ready</div></div>
+            <div class="tabs"><span class="on">Orders</span><span>Products</span></div>
+          </div></div>
+          <figcaption><b>Run your store</b>Accept, prepare and hand over orders from your phone.</figcaption></figure>
+
+        <figure class="shot"><div class="phone"><div class="bar"></div><div class="scr">
+            <h4>You are online</h4>
+            <small>14 deliveries · earned R612.40</small>
+            <div class="pcard"><b>Store order · earn R16.80</b><small>0.8 km to pickup · Burger Joint</small><div class="pbtn">Accept job</div></div>
+            <div class="pcard"><b>Parcel · earn R38.40</b><small>2.3 km to pickup · Loop Street</small><div class="pbtn">Accept job</div></div>
+            <div class="pcard"><b>#1040 · picked up</b><small>Drop-off: 5 Loop Street</small><b>Collect R98.00 cash</b><div class="pbtn">Delivered</div></div>
+          </div></div>
+          <figcaption><b>Drive when you want</b>Go online, take nearby jobs, and see what you earn.</figcaption></figure>
+
+        <figure class="shot"><div class="phone"><div class="bar"></div><div class="scr">
+            <h4>Add product</h4>
+            <div class="pcard"><small>Name</small><b>Phone Stand</b></div>
+            <div class="pcard"><small>Selling price</small><b>R199.00</b></div>
+            <div class="pcard"><small>Supplier cost</small><b>R90.00</b></div>
+            <div class="pcard"><div class="row"><small>Your margin</small><b class="ok mono">R109.00</b></div></div>
+            <div class="pbtn">Add product</div>
+          </div></div>
+          <figcaption><b>Sell without stock</b>List dropshipped items with your price and the supplier's cost.</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="sell" class="wrap">
+    <div class="split">
+      <div>
+        <p class="eyebrow">For sellers</p>
+        <h2 style="margin-top:12px">List what you don't hold. Keep the margin.</h2>
+        <p class="lead" style="margin-top:16px">Add a product with your price and the supplier's cost. DropIt shows your margin and blocks any price set below cost, so you never sell at a loss by accident. Supplier cost stays private from customers.</p>
+        <div class="cta"><a class="btn" href="#try">Open the store owner view</a></div>
+      </div>
+      <div class="ledger" role="img" aria-label="Example margin: selling price R199, supplier cost R90, margin R109">
+        <div class="r"><span>Phone Stand</span><span>sample</span></div>
+        <div class="r"><span>Selling price</span><span>R199.00</span></div>
+        <div class="r"><span>Supplier cost</span><span>− R90.00</span></div>
+        <div class="r t"><span>Your margin</span><span>R109.00</span></div>
+        <p class="n">Prices set below supplier cost are rejected.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="drive" class="wrap" style="padding-top:0">
+    <div class="head"><p class="eyebrow">How it works</p><h2>Everyone gets what they need.</h2></div>
+    <div class="roles">
+      <div class="role"><h3>Customers</h3><ul><li>Browse five service types</li><li>See the full price before ordering</li><li>Pay cash or card</li><li>Track, cancel and rate</li></ul></div>
+      <div class="role"><h3>Stores and sellers</h3><ul><li>Set up a store in a minute</li><li>Manage products and prices</li><li>Accept and prepare orders</li><li>Dropship items you don't stock</li></ul></div>
+      <div class="role"><h3>Drivers</h3><ul><li>Go online when you're free</li><li>Take jobs near you</li><li>Only one driver gets each job</li><li>Keep 80% of delivery fees and tips</li></ul></div>
+    </div>
+  </section>
+
+  <section id="try" class="wrap live">
+    <div class="livegrid">
+      <div>
+        <p class="eyebrow">Live preview</p>
+        <h2 style="margin-top:12px">Try it right here.</h2>
+        <p class="lead" style="margin-top:14px">This is the real app running in your browser with sample data. Nothing you do here is saved or sent anywhere.</p>
+        <ol class="steps">
+          <li><b>Tap Customer</b> in the app, then Food, then Burger Joint.</li>
+          <li><b>Add items and place an order.</b> Watch it move from placed to delivered on the Orders tab.</li>
+          <li><b>Log out and tap Store owner or Driver</b> to see the other side of the same order.</li>
+        </ol>
+      </div>
+      <div id="frame"><div id="root"></div></div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap"><span>DropIt preview build. Stores, prices and drivers shown are sample data.</span><span>Cape Town, South Africa</span></div></footer>
+<script>{{BUNDLE}}</script>
