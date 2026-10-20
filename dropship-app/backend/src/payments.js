@@ -112,3 +112,7 @@ export function providerFromEnv(env = process.env) {
 
 export const paymentRef = (orderId) => `DROP${String(orderId).padStart(8, '0')}`; // 12 chars
 export const orderIdFromRef = (ref) => (/^DROP\d{8}$/.test(ref || '') ? Number(ref.slice(4)) : null);
+
+// Marketplace orders use their own reference prefix so webhooks can tell the two apart.
+export const marketRef = (orderId) => `MCON${String(orderId).padStart(8, '0')}`; // 12 chars
+export const marketIdFromRef = (ref) => (/^MCON\d{8}$/.test(ref || '') ? Number(ref.slice(4)) : null);

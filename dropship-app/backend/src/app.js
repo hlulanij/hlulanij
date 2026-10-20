@@ -6,6 +6,7 @@ import { openDb } from './db.js';
 import { SERVICES, distanceKm, quote } from './pricing.js';
 import { canTransition, actorFor } from './orderState.js';
 import { rateLimit } from './rateLimit.js';
+import { mountMarketEarly, mountMarket } from './market.js';
 import { providerFromEnv, paymentRef, orderIdFromRef, toMoney } from './payments.js';
 
 const NEARBY_KM = 15;
@@ -51,7 +52,9 @@ export function createApp({
     res.json({ ok: true });
   });
 
+  mountMarketEarly(app, { db, secret, payments });
   app.use(express.json({ limit: '50kb' }));
+  mountMarket(app, { db, secret, payments, publicUrl, authLimit });
 
   const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
   const bad = (res, msg, code = 400) => res.status(code).json({ error: msg });
@@ -382,6 +385,8 @@ checkout.render('#payment-form');</script>`}
 
   // eslint-disable-next-line no-unused-vars
   app.use((err, _req, res, _next) => {
+    if (err.type === 'entity.too.large') return res.status(413).json({ error: 'That upload is too large.' });
+    if (err.type === 'entity.parse.failed') return res.status(400).json({ error: 'The request could not be read.' });
     console.error(err);
     res.status(500).json({ error: 'internal error' });
   });
