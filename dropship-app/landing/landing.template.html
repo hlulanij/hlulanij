@@ -109,6 +109,25 @@ figure{margin:0}
 .ledger .r.t{border-top:1px dashed var(--line);padding-top:10px;color:var(--ok);font-weight:500}
 .ledger .n{color:var(--mute);font-family:var(--f-body);font-size:.85rem}
 
+/* get the app */
+.navbtn{background:var(--accent);color:var(--accent-fg)!important;padding:.45em .95em;border-radius:10px;font-weight:700}
+.get{background:var(--surface);border-block:1px solid var(--line)}
+.getgrid{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:start}
+.getgrid > *{min-width:0}
+.stores{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+.store{display:flex;flex-direction:column;border:2px dashed var(--line);border-radius:12px;padding:10px 18px;color:var(--mute);min-width:160px}
+.store small{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase}
+.store b{font-family:var(--f-display);font-size:1.15rem;color:var(--fg)}
+.formcard{background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:14px}
+.formcard label{display:flex;flex-direction:column;gap:6px;font-weight:500;font-size:.92rem}
+.formcard input,.formcard select{font:inherit;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:.75em .9em;width:100%}
+.formcard .opt{color:var(--mute);font-weight:400}
+.formcard button{font:inherit;cursor:pointer}
+.formcard button[disabled]{opacity:.55;cursor:not-allowed}
+.fine{font-size:.82rem;color:var(--mute)}
+.status{min-height:1.4em;font-size:.95rem}
+.status.err{color:var(--accent)}
+.status.good{color:var(--ok);font-weight:700}
 /* live */
 .live{border-top:1px solid var(--line)}
 .livegrid{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:40px;align-items:start}
@@ -122,7 +141,7 @@ footer{border-top:1px solid var(--line);padding-block:32px;color:var(--mute);fon
 footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
 @media (max-width:860px){
-  .hero,.split,.livegrid{grid-template-columns:1fr}
+  .hero,.split,.livegrid,.getgrid{grid-template-columns:1fr}
   .services,.roles{grid-template-columns:1fr 1fr}
   .stage{order:-1}
   section{padding-block:52px}
@@ -130,6 +149,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 @media (max-width:560px){
   .services,.roles{grid-template-columns:1fr}
   .nav nav a:not(.keep){display:none}
+  .nav nav{gap:12px}
 }
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 </style>
@@ -137,7 +157,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 <header class="wrap nav">
   <a class="brand" href="#top">Drop<i>It</i></a>
   <nav aria-label="Sections">
-    <a href="#services">Services</a><a href="#screens">The app</a><a href="#sell">Sell</a><a href="#drive">Drive</a><a class="keep" href="#try"><b>Try it live</b></a>
+    <a href="#services">Services</a><a href="#screens">The app</a><a href="#sell">Sell</a><a href="#drive">Drive</a><a class="keep" href="#try">Try it live</a><a class="keep navbtn" href="#get">Get the app</a>
   </nav>
 </header>
 
@@ -149,7 +169,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
       <p class="lead">Order food, groceries, medicine, shopping and parcels from stores near you. Local drivers bring it. Stores and sellers run their own shop from the same app.</p>
       <div class="cta">
         <a class="btn" href="#try">Try the live app</a>
-        <a class="btn ghost" href="#screens">See the screens</a>
+        <a class="btn ghost" href="#get">Get the app</a>
       </div>
       <div class="meta"><span>iPhone and Android</span><span>Cash or card</span><span>Preview build</span></div>
     </div>
@@ -293,7 +313,75 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
       <div id="frame"><div id="root"></div></div>
     </div>
   </section>
+  <section id="get" class="get">
+    <div class="wrap getgrid">
+      <div>
+        <p class="eyebrow">Get the app</p>
+        <h2 style="margin-top:12px">Be first on your phone.</h2>
+        <p class="lead" style="margin-top:14px">The iPhone and Android apps are being prepared for release. You can use the full app in your browser today, and join the list to hear the day it lands in your app store.</p>
+        <div class="stores" aria-label="App store listings, coming soon">
+          <div class="store" aria-disabled="true"><small>Coming soon</small><b>App Store</b></div>
+          <div class="store" aria-disabled="true"><small>Coming soon</small><b>Google Play</b></div>
+        </div>
+        <div class="cta"><a class="btn ghost" href="#try">Use it in your browser now</a></div>
+      </div>
+      <form class="formcard" id="signup" novalidate>
+        <h3>Join the list</h3>
+        <label for="su-name">Full name<input id="su-name" name="name" autocomplete="name" required maxlength="80"></label>
+        <label for="su-email">Email<input id="su-email" name="email" type="email" autocomplete="email" required maxlength="120"></label>
+        <label for="su-role">I want to
+          <select id="su-role" name="role">
+            <option value="customer">Order food, groceries and more</option>
+            <option value="store">Sell from my store</option>
+            <option value="driver">Drive and deliver</option>
+          </select>
+        </label>
+        <label for="su-area">Suburb or city <span class="opt">(optional)</span><input id="su-area" name="area" autocomplete="address-level2" maxlength="80"></label>
+        <button class="btn" id="su-btn" type="submit">Join the list</button>
+        <p class="status" id="su-status" role="status" aria-live="polite"></p>
+        <p class="fine">We keep your name and email only to tell you when DropIt launches. Only the DropIt owner can see them.</p>
+      </form>
+    </div>
+  </section>
 </main>
 
 <footer><div class="wrap"><span>DropIt preview build. Stores, prices and drivers shown are sample data.</span><span>Cape Town, South Africa</span></div></footer>
+<script>
+(function(){
+  var form=document.getElementById('signup'),btn=document.getElementById('su-btn'),st=document.getElementById('su-status');
+  var db=null,uid=null,ready=false;
+  function say(t,k){st.textContent=t;st.className='status'+(k?' '+k:'');}
+  var c=window.claude;
+  if(c&&c.use){
+    Promise.all([c.use('db'),c.use('user')]).then(async function(r){
+      db=r[0];var user=r[1];
+      if(!db||!user){return;}
+      try{uid=await user.id();}catch(e){}
+      var canWrite=null;try{canWrite=user.can?await user.can('data.write'):null;}catch(e){}
+      if(!uid){return;}
+      if(canWrite===false){say('Sign-up on this preview is open to invited testers. Ask the owner for access.','err');btn.disabled=true;return;}
+      ready=true;
+      try{
+        var snap=await db.doc('signups/'+uid).get();
+        var d=snap&&(snap.exists===true||snap.exists===undefined)&&(snap.data?snap.data():snap);
+        if(d&&d.email){document.getElementById('su-name').value=d.name||'';document.getElementById('su-email').value=d.email;document.getElementById('su-role').value=d.role||'customer';document.getElementById('su-area').value=d.area||'';say("You're already on the list. Submit again to update your details.",'good');}
+      }catch(e){}
+    }).catch(function(){});
+  }
+  form.addEventListener('submit',async function(e){
+    e.preventDefault();
+    var name=document.getElementById('su-name').value.trim(),email=document.getElementById('su-email').value.trim();
+    if(name.length<2){say('Enter your full name.','err');document.getElementById('su-name').focus();return;}
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){say('Enter a valid email address, like name@example.com.','err');document.getElementById('su-email').focus();return;}
+    if(!ready){say('Sign-up works for invited testers who are signed in to claude.ai. Ask the owner for access.','err');return;}
+    btn.disabled=true;say('Saving…');
+    try{
+      await db.doc('signups/'+uid).set({name:name,email:email,role:document.getElementById('su-role').value,area:document.getElementById('su-area').value.trim(),created:new Date().toISOString()});
+      say("You're on the list. We'll email you when DropIt launches.",'good');
+    }catch(err){
+      say('We could not save your sign-up. Check your connection and try again.','err');
+    }finally{btn.disabled=false;}
+  });
+})();
+</script>
 <script>{{BUNDLE}}</script>
