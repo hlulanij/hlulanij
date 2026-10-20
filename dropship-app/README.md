@@ -1,3 +1,20 @@
+# MzansiConnect: marketplace for Giyani and nearby villages
+
+A website where people in Giyani and the surrounding villages buy and sell firewood, livestock, farming supplies,
+produce and building materials, and book tractor, water and transport services.
+It runs as one small Node service: the API (`backend/src`) and the website (`backend/public`) are served together.
+
+- **Website:** `backend/public` (plain HTML, CSS and JavaScript, no build step). Installable from the browser (Add to Home screen).
+- **API:** `backend/src/market.js` (accounts, listings, per-seller orders, service requests, photos, Peach payments).
+- **Rules:** sellers arrange delivery. R30 in the same village, R60 to other villages, free over R800 per seller, livestock agreed with the seller. Cash, EFT and card.
+- **Preview mode:** `DEMO_SEED=1` loads sample sellers and listings and shows a "Preview version" banner. Turn it off to launch with real sellers only.
+- **Run locally:** `cd backend && npm install && DEMO_SEED=1 npm start`, then open http://localhost:3000. Tests: `npm test`.
+- **Deploy:** `render.yaml` at the repo root. Free plan data resets on restart, so move to a paid instance with a disk (`DB_PATH=/data/data.sqlite`) before real sellers join.
+
+The earlier delivery-app prototype (`mobile/`, `backend/src/app.js` order routes) is kept for now and can be removed.
+
+---
+
 # DropIt: on-demand delivery + dropshipping marketplace
 
 One mobile app (iOS + Android, Expo/React Native) with three roles, backed by a Node API.

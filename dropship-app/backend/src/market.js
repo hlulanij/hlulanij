@@ -114,12 +114,12 @@ function markPaid(db, orderId) {
   } catch (e) { db.exec('ROLLBACK'); throw e; }
 }
 
-export function mountMarket(app, { db, secret, payments, publicUrl, authLimit = 10 }) {
+export function mountMarket(app, { db, secret, payments, publicUrl, authLimit = 10, demo = false }) {
   const { sign, auth } = marketKit({ db, secret });
   app.use('/api/auth', rateLimit({ max: authLimit, windowMs: 60_000 }));
 
   /* ---- meta + photos ---- */
-  app.get('/api/meta', (_req, res) => res.json({ areas: AREAS, depts: DEPTS, units: UNITS }));
+  app.get('/api/meta', (_req, res) => res.json({ areas: AREAS, depts: DEPTS, units: UNITS, demo }));
   app.get('/api/photos/:id', (req, res) => {
     const p = db.prepare('SELECT mime, data FROM m_photos WHERE id = ?').get(req.params.id);
     if (!p) return res.status(404).end();
@@ -175,6 +175,8 @@ export function mountMarket(app, { db, secret, payments, publicUrl, authLimit = 
     if (q.sub) { where.push('l.sub = ?'); args.push(String(q.sub)); }
     if (q.type === 'good' || q.type === 'service') { where.push('l.type = ?'); args.push(q.type); }
     if (q.seller) { where.push('l.seller_id = ?'); args.push(Number(q.seller) || 0); }
+    const ids = String(q.ids || '').split(',').map(Number).filter((n) => Number.isInteger(n) && n > 0).slice(0, 50);
+    if (q.ids !== undefined) { if (!ids.length) return res.json({ total: 0, items: [] }); where.push(`l.id IN (${ids.map(() => '?').join(',')})`); args.push(...ids); }
     const villages = String(q.villages || '').split(',').filter((v) => AREAS.includes(v));
     if (villages.length) { where.push(`s.village IN (${villages.map(() => '?').join(',')})`); args.push(...villages); }
     if (q.min) { where.push('l.price_cents >= ?'); args.push(Math.round(Number(q.min) * 100) || 0); }
@@ -333,10 +335,12 @@ export function mountMarket(app, { db, secret, payments, publicUrl, authLimit = 
     try { c = jwt.verify(String(req.query.token || ''), secret); } catch { return res.status(401).send('This payment link has expired. Go back and try again.'); }
     if (c.purpose !== 'mcheckout') return res.status(401).send('Invalid link');
     const safe = (v) => JSON.stringify(v).replace(/</g, '\\u003c');
+    const tokenAttr = String(req.query.token).replace(/[^A-Za-z0-9._-]/g, ''); // JWT characters only, safe inside an HTML attribute
     res.type('html').send(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <body style="font-family:system-ui,sans-serif;margin:0;padding:16px"><div id="payment-form" style="min-height:360px"></div>
 ${c.mock
-  ? `<button style="width:100%;padding:14px;font-size:16px" onclick="fetch('/api/payments/mock/complete?token='+encodeURIComponent(${safe(String(req.query.token))}),{method:'POST'}).then(function(){window.parent.postMessage('completed','*');document.body.innerHTML='<p>Payment received (test mode). You can close this page.</p>'})">Simulate successful payment (test mode)</button>`
+  ? `<button id="pay" style="width:100%;padding:14px;font-size:16px" data-token="${tokenAttr}">Simulate successful payment (test mode)</button>
+<script>document.getElementById('pay').onclick=function(){var t=this.getAttribute('data-token');fetch('/api/payments/mock/complete?token='+encodeURIComponent(t),{method:'POST'}).then(function(r){if(!r.ok)throw 0;try{window.parent.postMessage('completed','*')}catch(e){}document.body.innerHTML='<p>Payment received (test mode). You can close this page.</p>'}).catch(function(){document.body.insertAdjacentHTML('beforeend','<p>That did not work. Close this window and try again.</p>')})}</script>`
   : `<script src="${c.scriptUrl}"></script><script>
 var post=function(m){try{window.parent.postMessage(m,'*')}catch(e){}};
 var checkout=Checkout.initiate({key:${safe(c.entityId)},checkoutId:${safe(c.checkoutId)},options:{},events:{onCompleted:function(){post('completed')},onCancelled:function(){post('cancelled')},onExpired:function(){post('expired')}}});

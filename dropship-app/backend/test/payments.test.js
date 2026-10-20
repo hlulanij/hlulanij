@@ -139,7 +139,10 @@ test('mock provider completes via the checkout token, and the page is safe to re
     const page = await fetch(checkout_url.replace('https://api.test', t.base));
     assert.equal(page.status, 200);
     assert.match(await page.text(), /Simulate successful payment/);
-    const token = new URL(checkout_url).searchParams.get('token');
+    const html = await (await fetch(checkout_url.replace('https://api.test', t.base))).text();
+    assert.doesNotThrow(() => new Function(html.match(/<script>([\s\S]*?)<\/script>/)[1])); // the button's script must parse
+    const token = html.match(/data-token="([^"]+)"/)[1];
+    assert.equal(token, new URL(checkout_url).searchParams.get('token'));
     assert.equal((await t.raw('POST', '/payments/mock/complete?token=bad')).status, 401);
     assert.equal((await t.raw('POST', `/payments/mock/complete?token=${encodeURIComponent(token)}`)).status, 200);
     assert.equal((await t.call('GET', `/orders/${o.id}`, null, t.cust)).body.status, 'placed');

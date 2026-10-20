@@ -1,4 +1,6 @@
-# One-click deploy: Render > New > Blueprint > pick this repo. Free plan, demo mode.
+# One-click deploy: Render > New > Blueprint > pick this repo. Free plan, preview mode.
+# To launch for real: remove DEMO_SEED and ALLOW_MOCK_PAYMENTS, add the PEACH_* variables, and move to a paid
+# instance with a disk mounted at /data (set DB_PATH=/data/data.sqlite) so seller accounts and orders survive restarts.
 services:
   - type: web
     name: dropit-api

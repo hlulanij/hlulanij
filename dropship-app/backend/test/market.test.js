@@ -237,7 +237,11 @@ test('mock payment provider completes through the checkout token', async () => {
     const { checkoutUrl } = (await t.call('POST', `/api/orders/${o.id}/pay`, {}, buyer)).body;
     const page = await fetch(checkoutUrl.replace('https://api.test', t.base));
     assert.equal(page.status, 200); assert.match(await page.text(), /Simulate successful payment/);
-    const token = new URL(checkoutUrl).searchParams.get('token');
+    const html = await (await fetch(checkoutUrl.replace('https://api.test', t.base))).text();
+    const token = html.match(/data-token="([^"]+)"/)[1]; // what the button's script sends
+    assert.equal(token, new URL(checkoutUrl).searchParams.get('token'));
+    const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
+    assert.doesNotThrow(() => new Function(script)); // the page's script must be valid JavaScript
     assert.equal((await t.raw('POST', '/api/payments/mock/complete?token=bad')).status, 401);
     assert.equal((await t.raw('POST', `/api/payments/mock/complete?token=${encodeURIComponent(token)}`)).status, 200);
     assert.equal((await t.call('GET', '/api/orders', null, buyer)).body.find((x) => x.id === o.id).state, 'placed');

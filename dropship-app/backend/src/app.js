@@ -1,5 +1,9 @@
 import express from 'express';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import cors from 'cors';
+import compression from 'compression';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { openDb } from './db.js';
@@ -16,11 +20,14 @@ export function createApp({
   secret = process.env.JWT_SECRET || 'dev-secret-change-me',
   payments = providerFromEnv(),
   authLimit = 10,
+  demo = process.env.DEMO_SEED === '1',
+  publicDir = fileURLToPath(new URL('../public', import.meta.url)),
   publicUrl = process.env.PUBLIC_URL || 'http://localhost:3000',
 } = {}) {
   const app = express();
   app.set('trust proxy', 1); // behind Render/Railway's proxy, so req.ip is the real client
   app.disable('x-powered-by');
+  app.use(compression()); // smaller downloads on mobile data
   app.use((_req, res, next) => {
     res.set({ 'x-content-type-options': 'nosniff', 'referrer-policy': 'no-referrer', 'strict-transport-security': 'max-age=15552000' });
     next();
@@ -54,7 +61,7 @@ export function createApp({
 
   mountMarketEarly(app, { db, secret, payments });
   app.use(express.json({ limit: '50kb' }));
-  mountMarket(app, { db, secret, payments, publicUrl, authLimit });
+  mountMarket(app, { db, secret, payments, publicUrl, authLimit, demo });
 
   const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
   const bad = (res, msg, code = 400) => res.status(code).json({ error: msg });
@@ -339,10 +346,12 @@ export function createApp({
     try { c = jwt.verify(String(req.query.token || ''), secret); } catch { return res.status(401).send('Link expired'); }
     if (c.purpose !== 'checkout') return res.status(401).send('Invalid link');
     const safe = (v) => JSON.stringify(v).replace(/</g, '\\u003c');
+    const tokenAttr = String(req.query.token).replace(/[^A-Za-z0-9._-]/g, '');
     res.type('html').send(`<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1">
 <body style="font-family:sans-serif;margin:0;padding:12px"><div id="payment-form" style="min-height:360px"></div>
 ${c.mock
-  ? `<button style="width:100%;padding:14px" onclick="fetch('/payments/mock/complete?token='+encodeURIComponent(${safe(String(req.query.token))}),{method:'POST'}).then(()=>window.ReactNativeWebView&&window.ReactNativeWebView.postMessage('completed'))">Simulate successful payment (test mode)</button>`
+  ? `<button id="pay" style="width:100%;padding:14px" data-token="${tokenAttr}">Simulate successful payment (test mode)</button>
+<script>document.getElementById('pay').onclick=function(){var t=this.getAttribute('data-token');fetch('/payments/mock/complete?token='+encodeURIComponent(t),{method:'POST'}).then(function(r){if(!r.ok)throw 0;if(window.ReactNativeWebView)window.ReactNativeWebView.postMessage('completed')}).catch(function(){})}</script>`
   : `<script src="${c.scriptUrl}"></script><script>
 // [VERIFY] initiate/render API per Peach's Embedded Checkout tutorial
 var post=function(m){window.ReactNativeWebView&&window.ReactNativeWebView.postMessage(m)};
@@ -382,6 +391,26 @@ checkout.render('#payment-form');</script>`}
   }));
 
   app.get('/health', (_req, res) => res.json({ ok: true }));
+
+  // The MzansiConnect website. Same origin as the API, so there is no CORS to configure.
+  if (fs.existsSync(path.join(publicDir, 'index.html'))) {
+    const page = (res) => {
+      res.set({
+        'cache-control': 'no-cache',
+        'content-security-policy': "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; frame-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'self'",
+        'x-frame-options': 'SAMEORIGIN',
+      });
+      res.sendFile(path.join(publicDir, 'index.html'));
+    };
+    app.use(express.static(publicDir, { index: false, maxAge: '1h' }));
+    app.get('/', (_req, res) => page(res));
+    app.get(/^\/(shop|product|cart|checkout|my-orders|order|saved|login|sell|dashboard)(\/.*)?$/, (_req, res) => page(res));
+    // any other address typed into a browser gets the site's own "page not found"
+    app.get(/^(?!\/(api|auth|orders|vendor|vendors|driver|payments|services|health)(\/|$))/, (req, res, next) => {
+      if (req.accepts(['json', 'html']) !== 'html') return next();
+      res.status(404); page(res);
+    });
+  }
 
   // eslint-disable-next-line no-unused-vars
   app.use((err, _req, res, _next) => {
