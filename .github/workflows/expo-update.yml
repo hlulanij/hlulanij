@@ -1,0 +1,50 @@
+# Publishes the DropIt mobile app to your Expo account so it opens in Expo Go.
+# Needs: repo secret EXPO_TOKEN, repo variable EXPO_PUBLIC_API_URL (your Render URL).
+name: Publish app to Expo Go
+on:
+  push:
+    branches: [claude/trusting-turing-2xgi7q]
+    paths: ['dropship-app/mobile/**', '.github/workflows/expo-update.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dropship-app/mobile
+    env:
+      EXPO_PUBLIC_API_URL: ${{ vars.EXPO_PUBLIC_API_URL }}
+    steps:
+      - name: Check configuration
+        run: |
+          [ -n "${{ secrets.EXPO_TOKEN }}" ] || { echo "::error::Add the EXPO_TOKEN repository secret (Settings > Secrets and variables > Actions), then re-run this job."; exit 1; }
+          [ -n "$EXPO_PUBLIC_API_URL" ] || { echo "::error::Add the EXPO_PUBLIC_API_URL repository variable (your Render URL), then re-run this job."; exit 1; }
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: dropship-app/mobile/package-lock.json
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - name: Who am I
+        run: eas whoami
+      - name: Link or create the Expo project
+        run: eas init --non-interactive --force
+      - name: Enable updates
+        run: |
+          npx expo install expo-updates
+          eas update:configure --non-interactive
+      - name: Publish
+        run: eas update --branch preview --message "${{ github.sha }}" --non-interactive
+      - name: How to open it
+        run: |
+          echo "Published. On your iPhone open Expo Go > sign in as hlulanij > Projects/Updates, pick DropIt, branch 'preview'." >> "$GITHUB_STEP_SUMMARY"
