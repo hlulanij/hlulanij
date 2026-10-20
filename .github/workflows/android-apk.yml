@@ -1,5 +1,6 @@
-# Builds an installable Android APK (demo mode, simulated data) and publishes it as a GitHub Release.
-# Download link: https://github.com/hlulanij/hlulanij/releases/tag/preview
+# Builds two installable Android APKs and publishes each as a GitHub Release:
+#   preview: simulated data, no server needed   https://github.com/hlulanij/hlulanij/releases/tag/preview
+#   live:    talks to the real API on Render    https://github.com/hlulanij/hlulanij/releases/tag/live
 name: Build Android preview APK
 on:
   push:
@@ -16,13 +17,31 @@ concurrency:
 
 jobs:
   apk:
+    name: apk (${{ matrix.variant }})
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - variant: preview
+            title: DropIt preview (Android, simulated data)
+            file: dropit-preview.apk
+            demo: '1'
+            api: ''
+            note: 'Runs on **simulated data** (no server), so reviewers can try every screen.'
+          - variant: live
+            title: DropIt live test (Android, real server)
+            file: dropit-live.apk
+            demo: ''
+            api: https://dropit-api.onrender.com
+            note: 'Talks to the real DropIt API (free hosting, so the first action after idle can take about a minute). Sign up in the app or use customer@demo.test / password123.'
     defaults:
       run:
         working-directory: dropship-app/mobile
     env:
-      EXPO_PUBLIC_DEMO: '1'
+      EXPO_PUBLIC_DEMO: ${{ matrix.demo }}
+      EXPO_PUBLIC_API_URL: ${{ matrix.api }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -41,19 +60,19 @@ jobs:
       - name: Build release APK
         run: cd android && ./gradlew assembleRelease --no-daemon -Dorg.gradle.jvmargs=-Xmx3g
       - name: Name the APK
-        run: cp android/app/build/outputs/apk/release/app-release.apk dropit-preview.apk
+        run: cp android/app/build/outputs/apk/release/app-release.apk ${{ matrix.file }}
       - uses: actions/upload-artifact@v4
         with:
-          name: dropit-preview-apk
-          path: dropship-app/mobile/dropit-preview.apk
+          name: ${{ matrix.file }}
+          path: dropship-app/mobile/${{ matrix.file }}
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: preview
-          name: DropIt preview (Android)
+          tag_name: ${{ matrix.variant }}
+          name: ${{ matrix.title }}
           prerelease: true
-          files: dropship-app/mobile/dropit-preview.apk
+          files: dropship-app/mobile/${{ matrix.file }}
           body: |
-            Android preview build of DropIt. It runs on **simulated data** (no server), so reviewers can try every screen.
-            Install: download `dropit-preview.apk` on an Android phone, open it, and allow "install unknown apps" if asked.
+            Android build of DropIt. ${{ matrix.note }}
+            Install: download `${{ matrix.file }}` on an Android phone, open it, and allow "install unknown apps" if asked.
             Built from commit ${{ github.sha }}.

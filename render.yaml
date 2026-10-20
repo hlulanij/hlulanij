@@ -11,6 +11,8 @@ services:
     envVars:
       - key: JWT_SECRET
         generateValue: true
+      - key: PUBLIC_URL        # the API's own public address (card checkout page and webhooks use it)
+        value: https://dropit-api.onrender.com
       - key: DEMO_SEED          # creates demo accounts on every boot; remove for real use
         value: "1"
       - key: ALLOW_MOCK_PAYMENTS # no real charges; remove once Peach credentials are set
